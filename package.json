@@ -1,8 +1,8 @@
 {
   "name": "casamento-taiane-laudezir",
-  "version": "14.0.0",
+  "version": "15.0.0",
   "private": true,
-  "description": "Site do casamento de Taiane e Laudezir — V14 capa mobile e convite oficial no compartilhamento",
+  "description": "Site do casamento de Taiane e Laudezir — V15 estabilizada",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js"
