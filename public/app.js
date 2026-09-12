@@ -221,3 +221,17 @@ async function renderMercadoPagoBrick() {
     }
   });
 }
+
+
+// V9: em um novo acesso, iniciar sempre no topo/capa.
+window.addEventListener("load", () => {
+  const entry = performance.getEntriesByType("navigation")[0];
+  const navType = entry ? entry.type : "navigate";
+
+  if (navType === "navigate") {
+    if (window.location.hash) {
+      history.replaceState(null, "", window.location.pathname + window.location.search);
+    }
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }
+});

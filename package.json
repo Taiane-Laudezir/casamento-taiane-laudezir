@@ -1,8 +1,8 @@
 {
   "name": "casamento-taiane-laudezir",
-  "version": "8.0.0",
+  "version": "9.0.0",
   "private": true,
-  "description": "Site do casamento de Taiane e Laudezir — V8 otimizada para celular",
+  "description": "Site do casamento de Taiane e Laudezir — V9 mobile revisada após teste real",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js"

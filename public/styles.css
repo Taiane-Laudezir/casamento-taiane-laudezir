@@ -935,3 +935,66 @@ img{
     height:145px;
   }
 }
+
+
+/* ==========================================================
+   V9 — correções mobile após teste real em Android/WhatsApp
+   ========================================================== */
+
+/* Melhor ponto de parada ao clicar em links de navegação */
+section[id]{
+  scroll-margin-top:86px;
+}
+
+@media(max-width:600px){
+  section[id]{
+    scroll-margin-top:72px;
+  }
+
+  /* Capa mobile: prioriza o casal no enquadramento */
+  .hero{
+    background-position:68% center;
+  }
+
+  /* Filtros da lista de presentes: sem corte/rolagem horizontal */
+  .filters{
+    display:flex;
+    flex-wrap:wrap;
+    overflow:visible;
+    gap:8px;
+    padding:0;
+    margin:18px 0 22px;
+    justify-content:center;
+  }
+
+  .filter{
+    flex:1 1 calc(50% - 8px);
+    max-width:calc(50% - 4px);
+    min-width:0;
+    min-height:42px;
+    padding:10px 8px;
+    white-space:normal;
+    text-align:center;
+    line-height:1.15;
+  }
+
+  .gifts,
+  .gift-grid,
+  .gift-card,
+  .gift-body{
+    min-width:0;
+    max-width:100%;
+  }
+
+  /* O Grande Dia sem atalhos extras */
+  .event-shortcuts{
+    display:none !important;
+  }
+}
+
+@media(max-width:360px){
+  .filter{
+    flex-basis:100%;
+    max-width:100%;
+  }
+}
