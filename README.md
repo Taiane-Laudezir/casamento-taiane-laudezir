@@ -1,18 +1,13 @@
-# Casamento T&L — VERSÃO FINAL
+# Casamento T&L — VERSÃO FINALÍSSIMA
 
-Versão consolidada do site de Taiane & Laudezir.
+Estrutura final aprovada preservada.
 
-## Ajustes finais
-- capa mobile com nomes e data mais baixos e centralizados;
-- botão `Conheça nossa história` removido somente da capa mobile;
-- cabeçalho mobile compacto preservado no padrão aprovado;
-- botão fixo `TOPO` preservado;
-- narrativa de `Nossa História` preservada;
-- frase inicial da história efetivamente centralizada;
-- Ludmila e Juninho adicionados à seção de padrinhos com fotos tratadas;
-- nome `Antônio Junior` atualizado para `Juninho`;
-- desktop preservado;
-- convite oficial continua configurado como prévia de compartilhamento.
+## Últimos ajustes solicitados
+- seção **Nossa Família**: removido somente o texto complementar;
+- permanecem a foto, `NOSSA FAMÍLIA` e `O nosso maior presente.`;
+- removida somente a opção **Nossa Família** do menu hambúrguer;
+- a seção continua aparecendo normalmente durante a rolagem;
+- nenhum outro layout, botão, seção ou comportamento foi alterado.
 
 Commit sugerido:
-`Versão final - ajustes mobile e padrinhos`
+`Finalissima - simplifica Nossa Familia`
