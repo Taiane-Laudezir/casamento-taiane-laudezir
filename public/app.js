@@ -269,3 +269,29 @@ document.querySelectorAll('a[href^="#"]').forEach(link => {
     history.replaceState(null, "", hash);
   });
 });
+
+
+// V16 — botão fixo de retorno ao topo no mobile
+(() => {
+  const btn = document.getElementById("backToTop");
+  if (!btn) return;
+
+  const updateBackToTop = () => {
+    btn.classList.toggle("show", window.scrollY > Math.max(320, window.innerHeight * 0.55));
+  };
+
+  window.addEventListener("scroll", updateBackToTop, { passive: true });
+  updateBackToTop();
+
+  btn.addEventListener("click", () => {
+    const menu = document.querySelector(".mobile-menu");
+    const menuBtn = document.querySelector(".menu-btn");
+    if (menu) menu.classList.remove("open");
+    if (menuBtn) menuBtn.setAttribute("aria-expanded", "false");
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (history.replaceState) {
+      history.replaceState(null, "", location.pathname + location.search);
+    }
+  });
+})();
