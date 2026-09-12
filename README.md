@@ -1,19 +1,18 @@
-# Casamento T&L — V11 Mobile
+# Casamento T&L — V12 Mobile
 
-Refinamento exclusivo da seção **Nossa Família** para celular.
+Correção específica da seção **Nossa Família** no celular.
 
-## O que mudou
+## Causa encontrada
+Uma regra antiga mantinha `.family-photo` com `min-height: 520px` no mobile.
+Mesmo com a imagem menor, o contêiner continuava alto e criava o grande espaço vazio abaixo da foto.
 
-- foto ampliada para ocupar melhor a largura útil do celular;
-- preservação da imagem original, sem recorte agressivo;
-- redução do espaço vazio entre foto e conteúdo;
-- `NOSSA FAMÍLIA` aproximado da imagem;
-- título `O nosso maior presente` logo na sequência;
-- composição mais contínua e elegante em telas verticais;
-- demais seções mobile preservadas;
-- versão desktop preservada sem alterações.
+## Correção aplicada
+- `min-height: 0` no bloco da foto;
+- altura automática do contêiner;
+- imagem com altura automática;
+- alinhamento do bloco no início da seção;
+- desktop e demais seções permanecem inalterados.
 
 ## Atualização
-
-Substitua os arquivos locais pelos da V11, faça Commit + Push no GitHub Desktop.
-O Render fará o redeploy automático.
+Substitua os arquivos pela V12, faça Commit + Push no GitHub Desktop.
+O Render fará o redeploy automaticamente.

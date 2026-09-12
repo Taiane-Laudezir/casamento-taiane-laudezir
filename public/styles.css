@@ -1065,3 +1065,26 @@ header[id]{
     margin-bottom:18px;
   }
 }
+
+
+/* ==========================================================
+   V12 — correção do espaço vazio na seção Família (mobile)
+   ========================================================== */
+
+@media(max-width:600px){
+  .family{
+    align-items:start !important;
+  }
+
+  .family-photo{
+    min-height:0 !important;
+    height:auto !important;
+    align-self:start !important;
+  }
+
+  .family-photo img{
+    height:auto !important;
+    min-height:0 !important;
+    display:block !important;
+  }
+}
