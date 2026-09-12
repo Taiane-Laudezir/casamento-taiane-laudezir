@@ -1,8 +1,8 @@
 {
   "name": "casamento-taiane-laudezir",
-  "version": "10.0.0",
+  "version": "11.0.0",
   "private": true,
-  "description": "Site do casamento de Taiane e Laudezir — V10 correção de navegação por âncoras",
+  "description": "Site do casamento de Taiane e Laudezir — V11 refinamento da seção família no mobile",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js"

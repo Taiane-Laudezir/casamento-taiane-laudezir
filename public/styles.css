@@ -1003,3 +1003,65 @@ section[id],
 header[id]{
   scroll-margin-top:0 !important;
 }
+
+
+/* ==========================================================
+   V11 — refinamento exclusivo da seção Família no mobile
+   Desktop permanece inalterado.
+   ========================================================== */
+
+@media(max-width:600px){
+  /* seção família vira um bloco contínuo e mais editorial */
+  .family{
+    padding-top:34px;
+    padding-bottom:58px;
+  }
+
+  .family-layout{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    gap:0 !important;
+  }
+
+  .family-photo{
+    width:calc(100% + 4px);
+    margin-left:-2px;
+    border-radius:20px;
+    overflow:hidden;
+    box-shadow:var(--shadow);
+  }
+
+  .family-photo img{
+    display:block;
+    width:100%;
+    height:auto !important;
+    aspect-ratio:auto !important;
+    object-fit:contain !important;
+    object-position:center center !important;
+  }
+
+  .family-copy{
+    padding:26px 2px 0 !important;
+  }
+
+  .family-copy .section-kicker{
+    margin-bottom:10px;
+    text-align:left;
+  }
+
+  .family-copy h2{
+    margin:0 0 18px;
+    font-size:clamp(42px,14vw,56px);
+    line-height:.94;
+    text-align:left;
+  }
+
+  .family-copy .lead,
+  .family-copy p{
+    text-align:left;
+  }
+
+  .family-copy .lead{
+    margin-bottom:18px;
+  }
+}
