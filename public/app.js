@@ -235,3 +235,37 @@ window.addEventListener("load", () => {
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }
 });
+
+
+// V10: navegação interna com posicionamento exato da seção.
+document.querySelectorAll('a[href^="#"]').forEach(link => {
+  link.addEventListener("click", event => {
+    const hash = link.getAttribute("href");
+    if (!hash || hash === "#") return;
+
+    const target = document.querySelector(hash);
+    if (!target) return;
+
+    event.preventDefault();
+
+    // Fecha o menu mobile antes de calcular a posição final.
+    if (typeof mainNav !== "undefined" && mainNav) {
+      mainNav.classList.remove("open");
+    }
+    if (typeof menuBtn !== "undefined" && menuBtn) {
+      menuBtn.setAttribute("aria-expanded", "false");
+    }
+    document.body.classList.remove("menu-open");
+
+    const top = target.getBoundingClientRect().top + window.scrollY;
+
+    window.scrollTo({
+      top,
+      left: 0,
+      behavior: "smooth"
+    });
+
+    // Atualiza a URL sem provocar um segundo salto de rolagem.
+    history.replaceState(null, "", hash);
+  });
+});

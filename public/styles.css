@@ -942,14 +942,7 @@ img{
    ========================================================== */
 
 /* Melhor ponto de parada ao clicar em links de navegação */
-section[id]{
-  scroll-margin-top:86px;
-}
-
 @media(max-width:600px){
-  section[id]{
-    scroll-margin-top:72px;
-  }
 
   /* Capa mobile: prioriza o casal no enquadramento */
   .hero{
@@ -997,4 +990,16 @@ section[id]{
     flex-basis:100%;
     max-width:100%;
   }
+}
+
+
+/* ==========================================================
+   V10 — correção definitiva de navegação por âncoras
+   ========================================================== */
+
+/* Não existe cabeçalho fixo fora da capa; portanto a seção deve
+   encostar exatamente no topo ao ser acionada por um botão/menu. */
+section[id],
+header[id]{
+  scroll-margin-top:0 !important;
 }

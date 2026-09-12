@@ -1,15 +1,19 @@
-# Casamento T&L — V9 Mobile
+# Casamento T&L — V10 Anchor Fix
 
-Versão revisada após teste real do site publicado no celular.
+Correção específica para o problema observado no computador e no celular:
+ao clicar nos botões/menu, a página parava antes do início real da seção e
+deixava parte da seção/imagem anterior visível.
 
-## Ajustes da V9
+## O que foi corrigido
 
-1. Capa mobile reposicionada para priorizar o casal e evitar corte excessivo da Taiane.
-2. Filtros da lista de presentes reorganizados em linhas, sem overflow horizontal.
-3. Em acesso novo, o site abre no topo/capa em vez de reabrir em `#historia`.
-4. Removidos os botões `Lista de presentes` e `Nossos padrinhos` da seção `O Grande Dia`.
-5. Âncoras ajustadas para posicionamento mais limpo ao clicar no menu.
+- removido o `scroll-margin-top` da V9;
+- links internos agora calculam a posição exata da seção;
+- menu mobile fecha antes do cálculo da rolagem;
+- a URL continua mostrando `#historia`, `#evento`, `#presentes` etc.,
+  mas sem provocar um segundo salto;
+- funcionamento igual no desktop e no mobile.
 
-## Próxima etapa
+## Atualização
 
-Substituir os arquivos da V8 pela V9 na pasta local do repositório, fazer Commit + Push no GitHub Desktop e aguardar o redeploy automático do Render.
+Substitua os arquivos locais pelos desta V10, faça Commit + Push no GitHub Desktop.
+O Render fará o redeploy automaticamente.
