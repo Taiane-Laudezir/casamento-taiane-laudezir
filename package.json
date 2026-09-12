@@ -1,8 +1,8 @@
 {
   "name": "casamento-taiane-laudezir",
-  "version": "12.0.0",
+  "version": "14.0.0",
   "private": true,
-  "description": "Site do casamento de Taiane e Laudezir — V12 correção de espaço vazio na seção família mobile",
+  "description": "Site do casamento de Taiane e Laudezir — V14 capa mobile e convite oficial no compartilhamento",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js"

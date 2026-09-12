@@ -1088,3 +1088,15 @@ header[id]{
     display:block !important;
   }
 }
+
+
+/* ==========================================================
+   V14 — capa mobile aprovada + convite oficial no WhatsApp
+   ========================================================== */
+@media(max-width:600px){
+  /* Abaixa somente o bloco de conteúdo da capa no celular,
+     preservando enquadramento, desktop e demais seções. */
+  .hero-content{
+    transform:translateY(48px);
+  }
+}

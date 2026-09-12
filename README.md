@@ -1,18 +1,10 @@
-# Casamento T&L — V12 Mobile
+# Casamento T&L — V14
 
-Correção específica da seção **Nossa Família** no celular.
+Versão focada em dois ajustes já aprovados:
 
-## Causa encontrada
-Uma regra antiga mantinha `.family-photo` com `min-height: 520px` no mobile.
-Mesmo com a imagem menor, o contêiner continuava alto e criava o grande espaço vazio abaixo da foto.
+1. **Capa mobile:** o bloco “Nós vamos nos casar / Taiane & Laudezir / 21.11.2026 / Conheça nossa história” foi deslocado para baixo para liberar melhor o rosto da Taiane.
+2. **WhatsApp:** a prévia social passa a usar o convite oficial fornecido pelo casal.
 
-## Correção aplicada
-- `min-height: 0` no bloco da foto;
-- altura automática do contêiner;
-- imagem com altura automática;
-- alinhamento do bloco no início da seção;
-- desktop e demais seções permanecem inalterados.
+O desktop e todas as demais seções permanecem sem alteração.
 
-## Atualização
-Substitua os arquivos pela V12, faça Commit + Push no GitHub Desktop.
-O Render fará o redeploy automaticamente.
+Após substituir os arquivos, faça Commit + Push origin no GitHub Desktop e aguarde o deploy automático do Render.
