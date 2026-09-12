@@ -1,17 +1,13 @@
-# Casamento T&L — V16 Mobile
+# Casamento T&L — V17
 
-Alterações exclusivas no mobile:
+Atualização exclusiva da seção **Nossa História**:
 
-- cabeçalho compacto conforme referência aprovada;
-- `T & L` alinhado à esquerda;
-- menu hambúrguer alinhado à direita;
-- fundo do cabeçalho escurecido/desfocado;
-- conteúdo da capa reposicionado mais abaixo sem `transform`;
-- botão `TOPO` fixo, exibido após rolar a página;
-- retorno suave ao início;
-- navegação e âncoras da V15 preservadas;
-- desktop preservado;
-- convite oficial permanece como imagem de compartilhamento.
+- narrativa reescrita na perspectiva do casal;
+- frase “Vou te apresentar uma pessoa, e é pra você casar.” centralizada;
+- aspas corrigidas e com respiro para não sobrepor a letra V;
+- texto atualizado para “ela transformou nossa vida e fez crescer nossa família”;
+- datas e marcos da história preservados;
+- demais partes da V16 permanecem inalteradas.
 
 Commit sugerido:
-`V16 - header mobile, capa e botão topo`
+`V17 - nova narrativa Nossa História`

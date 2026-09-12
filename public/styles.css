@@ -1314,3 +1314,44 @@ header[id]{
     width:78% !important;
   }
 }
+
+
+/* ==========================================================
+   V17 — Nossa História
+   ========================================================== */
+#historia .story-quote,
+#historia .quote,
+#historia .script,
+#historia .handwritten{
+  display:block;
+  width:100%;
+  max-width:780px;
+  margin-left:auto !important;
+  margin-right:auto !important;
+  text-align:center !important;
+  padding-left:18px;
+  padding-right:18px;
+  box-sizing:border-box;
+  text-indent:0 !important;
+}
+
+#historia .story-paragraph{
+  line-height:1.75;
+}
+
+/* Mobile: frase centralizada e com respiro suficiente para as aspas */
+@media(max-width:600px){
+  #historia .story-quote,
+  #historia .quote,
+  #historia .script,
+  #historia .handwritten{
+    padding:0 20px !important;
+    text-align:center !important;
+    line-height:1.08 !important;
+  }
+
+  #historia .story-paragraph{
+    text-align:left;
+    line-height:1.72;
+  }
+}
