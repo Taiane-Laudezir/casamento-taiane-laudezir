@@ -1,8 +1,8 @@
 {
   "name": "casamento-taiane-laudezir",
-  "version": "17.0.0",
+  "version": "18.0.0",
   "private": true,
-  "description": "Site do casamento de Taiane e Laudezir — V17 Nossa História",
+  "description": "Site final do casamento de Taiane e Laudezir",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js"

@@ -1355,3 +1355,119 @@ header[id]{
     line-height:1.72;
   }
 }
+
+
+/* ==========================================================
+   VERSÃO FINAL — refinamentos aprovados
+   ========================================================== */
+
+/* Nossa História: centralização efetiva da frase de abertura */
+#historia blockquote{
+  display:block;
+  width:100%;
+  max-width:780px;
+  margin:0 auto 26px !important;
+  padding:0 20px !important;
+  box-sizing:border-box;
+  text-align:center !important;
+  text-indent:0 !important;
+}
+
+/* Fotos finais de Ludmila e Juninho seguem o padrão dos padrinhos */
+.godparent-card .pair img{
+  object-fit:cover;
+  object-position:center 24%;
+}
+
+/* Desktop permanece como estava. Ajustes abaixo são exclusivamente mobile. */
+@media(max-width:600px){
+  /* Cabeçalho validado */
+  .nav{
+    height:64px !important;
+    min-height:64px !important;
+    padding:0 20px !important;
+    align-items:center !important;
+  }
+
+  .brand{
+    margin:0 !important;
+    font-size:17px !important;
+    letter-spacing:5px !important;
+    line-height:1 !important;
+  }
+
+  .menu-btn{
+    width:36px !important;
+    height:36px !important;
+    margin:0 !important;
+    padding:0 !important;
+    font-size:28px !important;
+    line-height:1 !important;
+  }
+
+  .nav-links{
+    top:64px !important;
+  }
+
+  /* Capa: nomes/data mais baixos e centralizados, sem alterar o fluxo */
+  .hero-content{
+    position:absolute !important;
+    top:57% !important;
+    left:9% !important;
+    right:9% !important;
+    width:auto !important;
+    max-width:none !important;
+    min-height:0 !important;
+    height:auto !important;
+    padding:0 !important;
+    margin:0 !important;
+    transform:none !important;
+    translate:none !important;
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:flex-start !important;
+    text-align:center !important;
+  }
+
+  .hero-content .eyebrow{
+    width:100%;
+    text-align:center !important;
+    margin:0 0 8px !important;
+  }
+
+  .hero .hero-names{
+    width:100% !important;
+    align-items:center !important;
+    margin:0 !important;
+  }
+
+  .hero .hero-names span,
+  .hero-content .date{
+    width:100%;
+    text-align:center !important;
+  }
+
+  .hero-content .date{
+    margin:14px 0 0 !important;
+  }
+
+  /* Pedido final: retirar apenas o botão da capa no celular */
+  .hero-content > .btn.primary{
+    display:none !important;
+  }
+
+  /* Frase da história no padrão aprovado */
+  #historia blockquote{
+    text-align:center !important;
+    padding:0 18px !important;
+    margin-bottom:24px !important;
+  }
+}
+
+/* Telefones baixos: mantém o conjunto visível sem voltar a sobrepor os rostos */
+@media(max-width:600px) and (max-height:700px){
+  .hero-content{
+    top:53% !important;
+  }
+}
