@@ -1552,3 +1552,133 @@ header[id]{
   color:var(--muted);
   cursor:pointer;
 }
+
+
+/* ==========================================================
+   PIX DIRETO + CARTÃO VIA MERCADO PAGO
+   ========================================================== */
+.payment-choice{
+  display:grid;
+  gap:18px;
+}
+.payment-choice-tabs{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  padding:5px;
+  border-radius:999px;
+  background:#ece8df;
+}
+.payment-choice-tab{
+  border:0;
+  border-radius:999px;
+  padding:12px 14px;
+  background:transparent;
+  color:var(--olive-dark);
+  font:600 11px/1.2 Montserrat,Arial,sans-serif;
+  letter-spacing:.7px;
+  cursor:pointer;
+}
+.payment-choice-tab.active{
+  background:var(--olive);
+  color:#fff;
+  box-shadow:0 5px 16px rgba(72,80,58,.18);
+}
+.payment-choice-panel{display:none}
+.payment-choice-panel.active{display:block}
+
+.pix-box{
+  display:grid;
+  gap:12px;
+  justify-items:center;
+  text-align:center;
+}
+.pix-box > strong{
+  font-family:"Cormorant Garamond",serif;
+  font-size:30px;
+}
+.pix-value{
+  margin:-4px 0 0;
+  font-size:23px;
+  font-weight:700;
+  color:var(--olive-dark);
+}
+.pix-qr{
+  width:min(70vw,270px);
+  height:auto;
+  border-radius:15px;
+  background:#fff;
+  padding:10px;
+  border:1px solid #ddd8cd;
+}
+.pix-help{
+  max-width:520px;
+  margin:0;
+  color:var(--muted);
+  font-size:13px;
+}
+.pix-label{
+  width:100%;
+  max-width:560px;
+  text-align:left;
+  margin-top:3px;
+  color:var(--olive-dark);
+  font-size:11px;
+  letter-spacing:.6px;
+  text-transform:uppercase;
+}
+.pix-copy-row{
+  width:100%;
+  max-width:560px;
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:8px;
+  align-items:stretch;
+}
+.pix-copy-row input,
+.pix-copy-row textarea{
+  min-width:0;
+  margin:0;
+  font-size:12px;
+  background:#fff;
+}
+.pix-copy-row textarea{
+  resize:none;
+  word-break:break-all;
+}
+.pix-copy-btn{
+  border-radius:12px;
+  min-width:110px;
+  padding:10px 12px;
+}
+.pix-box small{
+  color:var(--muted);
+  font-size:11px;
+}
+.pix-loading,
+.pix-error{
+  text-align:center;
+  padding:30px 12px;
+  color:var(--muted);
+}
+.pix-error{color:#8f4646}
+
+@media(max-width:600px){
+  .payment-choice-tabs{
+    grid-template-columns:1fr 1.35fr;
+  }
+  .payment-choice-tab{
+    padding:11px 8px;
+    font-size:10px;
+  }
+  .pix-copy-row{
+    grid-template-columns:1fr;
+  }
+  .pix-copy-btn{
+    width:100%;
+    min-height:44px;
+  }
+  .pix-qr{
+    width:min(74vw,250px);
+  }
+}

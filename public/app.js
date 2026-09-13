@@ -134,14 +134,107 @@ function closePayment() {
 
 function renderCheckoutPro() {
   container.innerHTML = `
-    <div class="checkout-pro-box">
-      <strong>Pagamento seguro pelo Mercado Pago</strong>
-      <p>Ao continuar, você será direcionado ao ambiente seguro do Mercado Pago para escolher a forma de pagamento.</p>
-      <button class="btn checkout-pro-btn" id="startCheckoutBtn">Ir para o Mercado Pago</button>
-      <small>Ambiente de teste nesta etapa da integração.</small>
+    <div class="payment-choice">
+      <div class="payment-choice-tabs" role="tablist" aria-label="Forma de pagamento">
+        <button type="button" class="payment-choice-tab active" id="pixTab" role="tab" aria-selected="true">PIX</button>
+        <button type="button" class="payment-choice-tab" id="cardTab" role="tab" aria-selected="false">CARTÃO DE CRÉDITO</button>
+      </div>
+
+      <div id="pixPanel" class="payment-choice-panel active" role="tabpanel">
+        <div class="pix-loading">Gerando seu Pix...</div>
+      </div>
+
+      <div id="cardPanel" class="payment-choice-panel" role="tabpanel">
+        <div class="checkout-pro-box">
+          <strong>Pagar com cartão de crédito</strong>
+          <p>Você será direcionado ao ambiente seguro do Mercado Pago para preencher os dados do cartão.</p>
+          <button class="btn checkout-pro-btn" id="startCheckoutBtn">Pagar com cartão</button>
+          <small>Integração Mercado Pago em ambiente de teste nesta etapa.</small>
+        </div>
+      </div>
     </div>`;
 
+  const pixTab = document.getElementById("pixTab");
+  const cardTab = document.getElementById("cardTab");
+  const pixPanel = document.getElementById("pixPanel");
+  const cardPanel = document.getElementById("cardPanel");
+
+  function activate(tab) {
+    const pixActive = tab === "pix";
+    pixTab.classList.toggle("active", pixActive);
+    cardTab.classList.toggle("active", !pixActive);
+    pixPanel.classList.toggle("active", pixActive);
+    cardPanel.classList.toggle("active", !pixActive);
+    pixTab.setAttribute("aria-selected", String(pixActive));
+    cardTab.setAttribute("aria-selected", String(!pixActive));
+  }
+
+  pixTab.addEventListener("click", () => activate("pix"));
+  cardTab.addEventListener("click", () => activate("card"));
   document.getElementById("startCheckoutBtn").addEventListener("click", startCheckout);
+
+  loadPix();
+}
+
+async function loadPix() {
+  const panel = document.getElementById("pixPanel");
+  if (!panel || !selectedGift) return;
+
+  try {
+    const response = await fetch("/api/pix", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({
+        giftId: selectedGift.id,
+        customAmount: selectedGift.id === "custom" ? selectedGift.value : undefined
+      })
+    });
+
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Não foi possível gerar o Pix.");
+
+    panel.innerHTML = `
+      <div class="pix-box">
+        <strong>Pix direto</strong>
+        <p class="pix-value">${money(result.amount)}</p>
+        <img class="pix-qr" src="${result.qrDataUrl}" alt="QR Code Pix para ${selectedGift.name}">
+        <p class="pix-help">Escaneie o QR Code no aplicativo do seu banco ou use uma das opções abaixo.</p>
+
+        <label class="pix-label">Chave Pix aleatória</label>
+        <div class="pix-copy-row">
+          <input id="pixKeyField" type="text" value="${result.pixKey}" readonly>
+          <button type="button" class="btn pix-copy-btn" data-copy-target="pixKeyField">Copiar chave</button>
+        </div>
+
+        <label class="pix-label">Pix Copia e Cola</label>
+        <div class="pix-copy-row pix-code-row">
+          <textarea id="pixCodeField" rows="3" readonly>${result.pixCopyPaste}</textarea>
+          <button type="button" class="btn pix-copy-btn" data-copy-target="pixCodeField">Copiar código</button>
+        </div>
+
+        <small>O valor já está preenchido conforme o presente escolhido.</small>
+      </div>`;
+
+    panel.querySelectorAll("[data-copy-target]").forEach(button => {
+      button.addEventListener("click", async () => {
+        const field = document.getElementById(button.dataset.copyTarget);
+        const text = field.value;
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch (_) {
+          field.focus();
+          field.select();
+          document.execCommand("copy");
+        }
+        const old = button.textContent;
+        button.textContent = "Copiado!";
+        setTimeout(() => button.textContent = old, 1600);
+      });
+    });
+  } catch (error) {
+    console.error(error);
+    panel.innerHTML = `<div class="pix-error">${error.message}</div>`;
+  }
 }
 
 async function startCheckout() {

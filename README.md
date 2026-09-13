@@ -1,41 +1,40 @@
-# Casamento T&L — Mercado Pago TESTE
+# Casamento T&L — PIX DIRETO + CARTÃO
 
-Primeira versão de integração com pagamento.
+## Fluxo de pagamento
 
-## Fluxo implementado
+### PIX
+O Pix é exibido dentro do próprio site:
+- QR Code;
+- chave Pix aleatória;
+- botão `Copiar chave`;
+- Pix Copia e Cola;
+- valor preenchido automaticamente conforme o presente selecionado.
 
-1. O convidado escolhe um presente.
-2. O site abre a confirmação do presente.
-3. O backend cria uma Order no Mercado Pago.
-4. O Mercado Pago devolve `checkout_url`.
-5. O convidado é redirecionado para o Checkout Pro.
-6. Após o pagamento, retorna ao site com uma mensagem de sucesso, pendência ou falha.
+**Atenção:** este Pix aponta para a chave real informada pelo casal. Um pagamento
+feito por esse QR Code é uma transferência real, mesmo enquanto o Mercado Pago
+ainda está usando credenciais de teste.
+
+### CARTÃO DE CRÉDITO
+O botão `Pagar com cartão` cria uma Order no Checkout Pro e redireciona o convidado
+ao Mercado Pago.
+
+O Checkout Pro foi configurado para:
+- priorizar cartão de crédito;
+- excluir Pix (`bank_transfer`);
+- excluir boleto (`ticket`);
+- excluir cartão de débito (`debit_card`).
+
+A conta Mercado Pago/saldo pode ainda aparecer quando o próprio Mercado Pago não
+permite sua exclusão.
 
 ## Segurança
+- Access Token continua somente no Render;
+- valores dos presentes fixos são validados no servidor;
+- Orders usam `X-Idempotency-Key`;
+- a chave Pix é pública por natureza nesta modalidade e aparece no site.
 
-- `MP_ACCESS_TOKEN` permanece exclusivamente no Render.
-- O navegador nunca recebe o Access Token.
-- O valor dos presentes fixos é validado no servidor.
-- Cada Order usa `X-Idempotency-Key`.
-- Esta versão usa apenas ambiente de teste.
-
-## Render
-
-A variável já cadastrada deve continuar com o nome:
-
-`MP_ACCESS_TOKEN`
-
-Opcionalmente, cadastre também:
-
-`BASE_URL=https://casamento-taiane-laudezir.onrender.com`
-
-Se `BASE_URL` não existir, o servidor usa automaticamente o endereço público do site.
-
-## Ainda não incluído
-
-O endpoint de Webhook está preparado, mas a validação e confirmação automática
-do pagamento serão feitas na próxima etapa, depois de validarmos o Checkout Pro.
+## Dependência adicionada
+`qrcode` para gerar o QR Code Pix no servidor.
 
 ## Commit sugerido
-
-`Mercado Pago teste - Checkout Pro Orders`
+`Pix direto e cartao Mercado Pago`

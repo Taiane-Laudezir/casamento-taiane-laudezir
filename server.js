@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const path = require("path");
 const crypto = require("crypto");
+const QRCode = require("qrcode");
 
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
@@ -61,6 +62,88 @@ function getGift(giftId, customAmount) {
   return { gift, amount: gift.value };
 }
 
+
+// PIX DIRETO — dados públicos necessários para gerar o BR Code.
+// A chave Pix é exibida no site conforme solicitado.
+const PIX_KEY = "58c24f5c-0aa8-4bc6-8851-c641b0952280";
+const PIX_HOLDER = "TAIANE IZABELE DE SOUSA";
+const PIX_CITY = "SAO JOSE PINHAIS";
+
+function pixTlv(id, value) {
+  const text = String(value);
+  return `${id}${String(text.length).padStart(2, "0")}${text}`;
+}
+
+function pixCrc16(payload) {
+  let crc = 0xFFFF;
+  for (let i = 0; i < payload.length; i++) {
+    crc ^= payload.charCodeAt(i) << 8;
+    for (let bit = 0; bit < 8; bit++) {
+      crc = (crc & 0x8000) ? ((crc << 1) ^ 0x1021) : (crc << 1);
+      crc &= 0xFFFF;
+    }
+  }
+  return crc.toString(16).toUpperCase().padStart(4, "0");
+}
+
+function buildPixPayload(amount) {
+  const merchantAccount =
+    pixTlv("00", "BR.GOV.BCB.PIX") +
+    pixTlv("01", PIX_KEY);
+
+  const additionalData = pixTlv("05", "***");
+
+  let payload =
+    pixTlv("00", "01") +
+    pixTlv("01", "11") +
+    pixTlv("26", merchantAccount) +
+    pixTlv("52", "0000") +
+    pixTlv("53", "986");
+
+  if (Number.isFinite(amount) && amount > 0) {
+    payload += pixTlv("54", amount.toFixed(2));
+  }
+
+  payload +=
+    pixTlv("58", "BR") +
+    pixTlv("59", PIX_HOLDER.slice(0, 25)) +
+    pixTlv("60", PIX_CITY.slice(0, 15)) +
+    pixTlv("62", additionalData);
+
+  payload += "6304";
+  return payload + pixCrc16(payload);
+}
+
+app.post("/api/pix", async (req, res) => {
+  try {
+    const { giftId, customAmount } = req.body || {};
+    const resolved = getGift(giftId, customAmount);
+
+    if (resolved.error) {
+      return res.status(400).json({ message: resolved.error });
+    }
+
+    const { gift, amount } = resolved;
+    const payload = buildPixPayload(amount);
+    const qrDataUrl = await QRCode.toDataURL(payload, {
+      errorCorrectionLevel: "M",
+      margin: 1,
+      width: 420
+    });
+
+    res.json({
+      giftName: gift.name,
+      amount,
+      pixKey: PIX_KEY,
+      pixCopyPaste: payload,
+      qrDataUrl
+    });
+  } catch (error) {
+    console.error("Erro ao gerar Pix:", error);
+    res.status(500).json({ message: "Não foi possível gerar o Pix." });
+  }
+});
+
 app.get("/api/health", (req, res) => {
   const token = String(process.env.MP_ACCESS_TOKEN || "");
   res.json({
@@ -105,6 +188,10 @@ app.post("/api/checkout/order", async (req, res) => {
           failure_url: `${baseUrl}/?payment_result=failure`,
           pending_url: `${baseUrl}/?payment_result=pending`,
           auto_return: "approved"
+        },
+        payment_method: {
+          default_type: "credit_card",
+          not_allowed_types: ["bank_transfer", "ticket", "debit_card"]
         }
       },
       items: [
