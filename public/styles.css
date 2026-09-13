@@ -1,0 +1,1554 @@
+:root{--olive:#596545;--olive-dark:#3f4933;--cream:#f7f2e8;--sand:#e8decd;--white:#fff;--ink:#2d3028;--muted:#73766d;--gold:#b99a63;--shadow:0 16px 45px rgba(45,50,37,.12)}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--cream);color:var(--ink);font-family:Montserrat,Arial,sans-serif;line-height:1.7}a{text-decoration:none;color:inherit}img{display:block;width:100%;height:100%;object-fit:cover}.hero{min-height:100vh;background:linear-gradient(90deg,rgba(26,31,22,.58) 0%,rgba(26,31,22,.30) 48%,rgba(26,31,22,.08) 100%),url('assets/hero.jpeg') center/cover;color:#fff;position:relative}.nav{height:82px;display:flex;align-items:center;justify-content:space-between;padding:0 6vw;border-bottom:1px solid rgba(255,255,255,.28);background:rgba(35,40,29,.14);backdrop-filter:blur(5px)}.brand{font-family:"Cormorant Garamond",serif;font-size:28px;font-weight:700;letter-spacing:3px}.nav-links{display:flex;gap:28px;font-size:13px;text-transform:uppercase;letter-spacing:1px}.nav-links a:hover{opacity:.72}.menu-btn{display:none;background:none;border:0;color:#fff;font-size:26px}.hero-content{min-height:calc(100vh - 82px);display:flex;justify-content:center;align-items:flex-start;flex-direction:column;text-align:left;padding:40px 7vw;max-width:760px}.eyebrow,.section-kicker{text-transform:uppercase;letter-spacing:4px;font-size:11px;font-weight:600}.hero h1{font-family:"Great Vibes",cursive;font-size:clamp(64px,8vw,118px);font-weight:400;margin:8px 0 0;line-height:.95}.hero h1 small{font-family:"Cormorant Garamond",serif;font-size:.35em;margin:0 12px}.date{font-family:Montserrat,Arial,sans-serif;font-size:27px;letter-spacing:8px;margin:28px 0}.btn{border:0;border-radius:999px;background:var(--olive);color:#fff;padding:13px 23px;font-weight:600;cursor:pointer;transition:.2s;font-family:inherit}.btn:hover{transform:translateY(-2px);background:var(--olive-dark)}.btn.primary{padding:15px 27px}.section{padding:94px 7vw}.section-kicker{color:var(--olive)}h2{font-family:"Cormorant Garamond",serif;font-size:clamp(38px,5vw,62px);line-height:1.05;margin:12px 0 24px}.lead{font-family:"Cormorant Garamond",serif;font-size:22px;color:#4e514a;max-width:850px;margin:0 auto}.story-heading{text-align:center;max-width:850px;margin:0 auto 55px}.story-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:70px;max-width:1180px;margin:auto;align-items:center}.story-copy p{margin:0 0 20px}.story-copy blockquote{font-family:"Great Vibes",cursive;font-size:40px;line-height:1.25;color:var(--olive);margin:0 0 30px}.portrait{height:680px;margin:0;border-radius:180px 180px 24px 24px;overflow:hidden;box-shadow:var(--shadow)}.rings-band{max-width:1050px;margin:75px auto 0;display:grid;grid-template-columns:1fr 1fr;background:#fff;border-radius:24px;overflow:hidden;box-shadow:var(--shadow)}.rings-band img{height:280px}.rings-band p{display:grid;place-items:center;text-align:center;padding:30px;font-family:"Great Vibes",cursive;font-size:36px;color:var(--olive)}.family{display:grid;grid-template-columns:1.15fr .85fr;padding:0;background:var(--sand);align-items:stretch}.family-photo{min-height:600px}.family-copy{padding:90px 8vw 90px 6vw;display:flex;justify-content:center;flex-direction:column}.family-copy p{max-width:580px}.cinema-band{height:72vh;min-height:520px;position:relative;overflow:hidden}.cinema-band:after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(20,20,16,.18),rgba(20,20,16,.56))}.cinema-band div{position:absolute;z-index:2;inset:0;display:grid;place-items:center;padding:30px}.cinema-band p{font-family:"Great Vibes",cursive;font-size:clamp(40px,6vw,76px);color:#fff;text-align:center;max-width:980px;line-height:1.15}.event{background:linear-gradient(rgba(247,242,232,.86),rgba(247,242,232,.92)),url('assets/church.jpeg') center/cover fixed}.event-card{background:rgba(255,255,255,.88);padding:58px;max-width:1050px;margin:auto;border-radius:28px;box-shadow:var(--shadow);text-align:center}.event-text{max-width:760px;margin:0 auto 35px;font-family:"Cormorant Garamond",serif;font-size:22px}.event-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}.event-grid div{padding:22px;border-top:1px solid var(--gold)}.event-grid span{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:2px}.event-grid strong{display:block;margin-top:8px;font-family:"Cormorant Garamond",serif;font-size:22px}.gifts{text-align:center}.filters{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin:35px 0}.filter{border:1px solid #d9d2c5;background:#eee7db;color:var(--ink);border-radius:999px;padding:10px 18px;cursor:pointer}.filter.active{background:var(--olive);color:#fff;border-color:var(--olive)}.gift-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;max-width:1240px;margin:30px auto 0}.gift-card{background:#fff;border-radius:18px;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;text-align:center;transition:.2s}.gift-card:hover{transform:translateY(-4px)}.gift-card.hidden-card{display:none}.gift-photo{height:165px}.gift-body{padding:20px;display:flex;flex:1;flex-direction:column;align-items:center}.gift-card h3{font-family:"Cormorant Garamond",serif;font-size:24px;line-height:1.05;margin:0 0 8px}.gift-card p{color:var(--muted);font-size:13px;margin:0 0 12px;min-height:44px}.gift-card strong{font-size:18px;margin:auto 0 14px}.gift-card .btn{width:100%}.custom-input{margin:0 0 12px;width:100%;border:1px solid #d6d1c8;border-radius:12px;padding:12px;font:inherit;text-align:center}.closing{display:grid;grid-template-columns:1.2fr .8fr;min-height:650px;background:var(--olive);color:#fff}.closing img{min-height:650px}.closing-copy{padding:70px;display:flex;justify-content:center;flex-direction:column;text-align:center}.closing .section-kicker{color:#e9e1d2}.signature,.footer-names{font-family:"Great Vibes",cursive}.signature{font-size:55px}.closing-copy h2{font-size:50px}footer{text-align:center;padding:45px;background:#2f3429;color:#eee}.footer-names{font-size:42px}.modal{position:fixed;inset:0;background:rgba(25,28,23,.74);display:grid;place-items:center;padding:20px;z-index:100}.modal.hidden{display:none}.modal-card{background:var(--cream);border-radius:24px;padding:34px;max-width:720px;width:100%;max-height:90vh;overflow:auto;position:relative}.close{position:absolute;right:18px;top:10px;border:0;background:none;font-size:32px;cursor:pointer}.selected-gift{display:flex;justify-content:space-between;gap:20px;background:#fff;padding:18px;border-radius:14px;margin-bottom:24px}.brick-placeholder{border:1px dashed #9fa394;border-radius:16px;padding:24px;text-align:center;background:#fff;display:grid;gap:8px}.brick-placeholder span{font-size:13px;color:var(--muted)}@media(max-width:950px){.gift-grid{grid-template-columns:repeat(2,1fr)}.story-grid{grid-template-columns:1fr}.portrait{height:600px;max-width:520px;width:100%;margin:auto}.family{grid-template-columns:1fr}.family-photo{min-height:520px}.closing{grid-template-columns:1fr}.nav-links{display:none;position:absolute;top:82px;left:0;right:0;background:rgba(46,48,42,.97);padding:24px;flex-direction:column;z-index:20}.nav-links.open{display:flex}.menu-btn{display:block}.hero-content{max-width:650px}.event-grid{grid-template-columns:1fr}}@media(max-width:600px){.section{padding:68px 20px}.hero{background-position:65% center}.hero-content{justify-content:flex-end;padding-bottom:80px;background:linear-gradient(0deg,rgba(25,30,20,.6),transparent 65%)}.hero h1{font-size:64px}.hero h1 small{font-size:.4em}.date{font-size:19px;letter-spacing:5px}.gift-grid{grid-template-columns:1fr}.portrait{height:520px}.rings-band{grid-template-columns:1fr}.rings-band p{font-size:31px}.family-copy{padding:65px 24px}.cinema-band{height:60vh;min-height:430px}.event-card{padding:35px 22px}.closing-copy{padding:65px 25px}.closing img{min-height:520px}.selected-gift{flex-direction:column}}
+
+
+.setup-message,.payment-result{
+  background:#fff;
+  border:1px solid #ded8cb;
+  border-radius:18px;
+  padding:26px;
+  text-align:center;
+  display:grid;
+  gap:10px;
+}
+.setup-message span{color:var(--muted);font-size:13px}
+.result-icon{
+  width:54px;height:54px;border-radius:50%;
+  display:grid;place-items:center;
+  margin:0 auto 6px;
+  background:var(--olive);color:white;
+  font-size:26px;font-weight:700;
+}
+.payment-result h3{font-family:"Cormorant Garamond",serif;font-size:30px;margin:0}
+.payment-result p{margin:0}
+.payment-result small{color:var(--muted)}
+.payment-error{color:#8b2d2d;font-size:13px}
+
+/* V4 — Padrinhos e informações do evento */
+.godparents{text-align:center;background:#f8f5ee}
+.godparents>.lead{max-width:820px;margin:0 auto 46px}
+.godparents-side{font-family:"Cormorant Garamond",serif;font-size:34px;font-weight:600;margin:46px 0 24px;color:var(--olive-dark)}
+.godparents-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:1120px;margin:0 auto}
+.godparent-card{background:#fff;border-radius:24px;padding:16px 16px 22px;box-shadow:var(--shadow)}
+.godparent-card .pair{display:grid;grid-template-columns:1fr 1fr;gap:8px;height:240px;margin-bottom:16px}
+.godparent-card .pair img,.photo-placeholder{width:100%;height:100%;object-fit:cover;border-radius:16px}
+.photo-placeholder{display:grid;place-items:center;background:#e8e2d6;color:var(--olive);font-family:"Cormorant Garamond",serif;font-size:38px}
+.godparent-card strong{display:block;font-family:"Cormorant Garamond",serif;font-size:23px}
+.godparent-card small{display:block;color:var(--muted);margin-top:5px}
+.verse{max-width:760px;margin:24px auto 42px;text-align:center;border-top:1px solid #d8d1c4;border-bottom:1px solid #d8d1c4;padding:26px 18px}
+.verse p{font-family:"Cormorant Garamond",serif;font-size:25px;font-style:italic;margin:0 0 8px}
+.verse span{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--olive)}
+.event-grid p{font-size:13px;color:var(--muted);margin:7px 0 0}
+@media(max-width:900px){.godparents-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.godparents-grid{grid-template-columns:1fr}.godparent-card .pair{height:280px}}
+
+
+/* V5 — revisão visual */
+.date{
+  font-variant-numeric: lining-nums tabular-nums;
+  font-weight:500;
+  letter-spacing:7px;
+}
+
+.godparents>.lead{margin-bottom:46px}
+.godparents-grid{grid-template-columns:repeat(3,1fr)}
+.godparents-side{display:none}
+
+.rings-band img{
+  object-position:center 48%;
+}
+
+.cinema-band img{
+  object-position:center 48%;
+}
+
+/* Foto adicional do ensaio */
+.photo-interlude{
+  max-width:1180px;
+  margin:0 auto;
+  padding:20px 7vw 92px;
+  display:grid;
+  grid-template-columns:1.45fr .55fr;
+  gap:28px;
+  align-items:stretch;
+}
+.photo-interlude-image{
+  min-height:440px;
+  border-radius:28px;
+  overflow:hidden;
+  box-shadow:var(--shadow);
+}
+.photo-interlude-image img{
+  object-position:center center;
+}
+.photo-interlude-copy{
+  border-radius:28px;
+  background:#fff;
+  box-shadow:var(--shadow);
+  padding:42px 34px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  text-align:center;
+}
+.photo-interlude-copy p:last-child{
+  margin:12px 0 0;
+  font-family:"Cormorant Garamond",serif;
+  font-size:28px;
+  line-height:1.35;
+  color:var(--olive-dark);
+  font-style:italic;
+}
+
+@media(max-width:900px){
+  .photo-interlude{grid-template-columns:1fr;padding-left:24px;padding-right:24px}
+  .photo-interlude-image{min-height:420px}
+}
+
+@media(max-width:600px){
+  .date{letter-spacing:4px;font-size:18px}
+  .godparents-grid{grid-template-columns:1fr}
+  .photo-interlude{padding:10px 20px 68px}
+  .photo-interlude-image{min-height:330px}
+  .photo-interlude-copy{padding:32px 22px}
+}
+
+
+/* ==========================================================
+   V6 — versão preparada para publicação
+   ========================================================== */
+
+/* Banner: mantém a foto original sem qualquer edição de rosto/cabelo.
+   O texto fica menor e restrito à área livre da esquerda. */
+.cinema-band{
+  height:68vh;
+  min-height:500px;
+  position:relative;
+  overflow:hidden;
+  background:#283021;
+}
+.cinema-band img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center center;
+}
+.cinema-band:after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(
+    90deg,
+    rgba(20,22,17,.68) 0%,
+    rgba(20,22,17,.42) 38%,
+    rgba(20,22,17,.12) 64%,
+    rgba(20,22,17,.18) 100%
+  );
+}
+.cinema-band .cinema-copy{
+  position:absolute;
+  z-index:2;
+  top:50%;
+  left:7vw;
+  transform:translateY(-50%);
+  width:min(42vw,650px);
+  padding:0;
+  display:block;
+}
+.cinema-band .cinema-copy p{
+  margin:0;
+  font-family:"Great Vibes",cursive;
+  font-size:clamp(34px,3.6vw,55px);
+  color:#fff;
+  text-align:left;
+  line-height:1.18;
+  text-shadow:0 2px 14px rgba(0,0,0,.28);
+}
+.cinema-band .cinema-copy span{
+  display:block;
+  margin-top:22px;
+  color:rgba(255,255,255,.88);
+  text-transform:uppercase;
+  letter-spacing:5px;
+  font-size:10px;
+  font-weight:600;
+}
+
+/* Localizações */
+.map-link{
+  display:inline-block;
+  margin-top:8px;
+  color:var(--olive-dark);
+  font-size:12px;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:1.2px;
+  border-bottom:1px solid var(--gold);
+  padding-bottom:3px;
+}
+.map-link:hover{opacity:.72}
+
+.event-shortcuts{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  flex-wrap:wrap;
+  margin:-6px 0 26px;
+}
+.event-shortcuts a{
+  border:1px solid rgba(89,101,69,.28);
+  color:var(--olive-dark);
+  background:rgba(247,242,232,.72);
+  border-radius:999px;
+  padding:8px 14px;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  font-weight:600;
+}
+
+/* Melhor consistência visual da data em toda a página */
+.date,
+.closing-copy > p:last-child,
+footer > p{
+  font-variant-numeric:lining-nums tabular-nums;
+}
+
+/* Padrinhos: fotos consistentes sem distorção */
+.pair img{
+  object-fit:cover;
+  object-position:center 24%;
+}
+
+/* Acessibilidade de teclado */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible{
+  outline:3px solid rgba(185,154,99,.55);
+  outline-offset:3px;
+}
+
+@media(max-width:900px){
+  .cinema-band .cinema-copy{
+    left:6vw;
+    width:48vw;
+  }
+  .cinema-band .cinema-copy p{
+    font-size:clamp(31px,5vw,47px);
+  }
+}
+
+@media(max-width:600px){
+  .cinema-band{
+    height:66vh;
+    min-height:500px;
+  }
+  .cinema-band img{
+    object-position:64% center;
+  }
+  .cinema-band:after{
+    background:linear-gradient(
+      0deg,
+      rgba(20,22,17,.78) 0%,
+      rgba(20,22,17,.34) 55%,
+      rgba(20,22,17,.12) 100%
+    );
+  }
+  .cinema-band .cinema-copy{
+    top:auto;
+    bottom:34px;
+    left:22px;
+    right:22px;
+    transform:none;
+    width:auto;
+  }
+  .cinema-band .cinema-copy p{
+    font-size:34px;
+    text-align:left;
+    max-width:410px;
+  }
+  .cinema-band .cinema-copy span{
+    letter-spacing:3px;
+    margin-top:14px;
+  }
+}
+
+
+/* ==========================================================
+   V7 — ajustes finais aprovados
+   ========================================================== */
+
+/* Nome do casal na capa: mesma caligrafia e & centralizado */
+.hero .hero-names{
+  display:inline-flex;
+  flex-direction:column;
+  align-items:center;
+  width:max-content;
+  max-width:100%;
+  font-family:"Great Vibes",cursive;
+  font-size:clamp(64px,8vw,118px);
+  font-weight:400;
+  line-height:.82;
+  margin:8px 0 0;
+}
+.hero .hero-names span{
+  display:block;
+  white-space:nowrap;
+}
+.hero .hero-names small{
+  display:block;
+  font:inherit;
+  font-size:.43em;
+  line-height:1;
+  margin:.10em 0 .03em;
+  text-align:center;
+}
+
+/* Substitui as regras antigas da faixa e mostra a foto completa.
+   A imagem permanece original; somente enquadramento no CSS. */
+.cinema-band{
+  position:relative;
+  height:auto;
+  min-height:0;
+  overflow:hidden;
+  background:#283021;
+}
+.cinema-band > img{
+  position:relative;
+  inset:auto;
+  display:block;
+  width:100%;
+  height:auto;
+  object-fit:contain;
+  object-position:center;
+}
+.cinema-band:after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(
+    90deg,
+    rgba(20,22,17,.66) 0%,
+    rgba(20,22,17,.38) 38%,
+    rgba(20,22,17,.10) 68%,
+    rgba(20,22,17,.10) 100%
+  );
+  pointer-events:none;
+}
+.cinema-band .cinema-copy{
+  position:absolute;
+  z-index:2;
+  top:50%;
+  left:5vw;
+  transform:translateY(-50%);
+  width:min(39vw,610px);
+  padding:0;
+  display:block;
+}
+.cinema-band .cinema-copy p{
+  margin:0;
+  font-family:"Great Vibes",cursive;
+  font-size:clamp(28px,3.0vw,46px);
+  color:#fff;
+  text-align:left;
+  line-height:1.18;
+  text-shadow:0 2px 14px rgba(0,0,0,.28);
+}
+.cinema-band .cinema-copy span{
+  display:block;
+  margin-top:18px;
+  color:rgba(255,255,255,.9);
+  text-transform:uppercase;
+  letter-spacing:5px;
+  font-size:10px;
+  font-weight:600;
+}
+
+@media(max-width:900px){
+  .hero .hero-names{
+    font-size:clamp(62px,10vw,94px);
+  }
+
+  .cinema-band .cinema-copy{
+    left:5vw;
+    width:42vw;
+  }
+  .cinema-band .cinema-copy p{
+    font-size:clamp(25px,4vw,38px);
+  }
+}
+
+@media(max-width:600px){
+  .hero .hero-names{
+    font-size:62px;
+    line-height:.86;
+  }
+  .hero .hero-names small{
+    font-size:.42em;
+    margin:.08em 0 .02em;
+  }
+
+  .cinema-band > img{
+    width:100%;
+    height:auto;
+  }
+  .cinema-band:after{
+    background:linear-gradient(
+      0deg,
+      rgba(20,22,17,.74) 0%,
+      rgba(20,22,17,.30) 52%,
+      rgba(20,22,17,.08) 100%
+    );
+  }
+  .cinema-band .cinema-copy{
+    top:auto;
+    bottom:24px;
+    left:20px;
+    right:20px;
+    transform:none;
+    width:auto;
+  }
+  .cinema-band .cinema-copy p{
+    max-width:390px;
+    font-size:30px;
+    line-height:1.15;
+  }
+  .cinema-band .cinema-copy span{
+    margin-top:12px;
+    letter-spacing:3px;
+    font-size:9px;
+  }
+}
+
+
+/* ==========================================================
+   V8 — Mobile-first review for WhatsApp access
+   Desktop design preserved; rules below optimize phones/tablets.
+   ========================================================== */
+
+html{
+  scroll-padding-top:84px;
+}
+
+body.site-body{
+  overflow-x:hidden;
+}
+
+body.menu-open{
+  overflow:hidden;
+}
+
+/* Touch ergonomics */
+button,
+.btn,
+.nav-links a,
+.map-link,
+.event-shortcuts a{
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+
+/* Better responsive images everywhere */
+img{
+  max-width:100%;
+  height:auto;
+}
+
+/* Tablet */
+@media(max-width:900px){
+  .nav{
+    height:74px;
+    padding:0 22px;
+  }
+
+  .brand{
+    font-size:25px;
+  }
+
+  .menu-btn{
+    display:block;
+    cursor:pointer;
+    line-height:1;
+    padding:10px;
+    margin-right:-10px;
+  }
+
+  .nav-links{
+    top:74px;
+    max-height:calc(100dvh - 74px);
+    overflow-y:auto;
+    padding:22px 24px 28px;
+    gap:0;
+    border-bottom:1px solid rgba(255,255,255,.12);
+    box-shadow:0 18px 36px rgba(0,0,0,.22);
+  }
+
+  .nav-links a{
+    min-height:50px;
+    display:flex;
+    align-items:center;
+    padding:10px 2px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+
+  .hero{
+    min-height:100svh;
+  }
+
+  .hero-content{
+    min-height:calc(100svh - 74px);
+    padding:44px 24px 54px;
+  }
+
+  .section{
+    padding:78px 28px;
+  }
+
+  .lead{
+    font-size:22px;
+  }
+
+  .story-layout,
+  .family-layout{
+    gap:28px;
+  }
+
+  .gift-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:18px;
+  }
+
+  .event-grid{
+    gap:18px;
+  }
+
+  .godparents-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:22px;
+  }
+
+  .modal-card{
+    width:min(94vw,720px);
+    padding:28px 22px;
+  }
+}
+
+/* Phones */
+@media(max-width:600px){
+  html{
+    scroll-padding-top:70px;
+  }
+
+  body{
+    line-height:1.55;
+  }
+
+  .nav{
+    height:66px;
+    padding:0 16px 0 18px;
+    background:rgba(36,41,31,.28);
+    backdrop-filter:blur(5px);
+  }
+
+  .brand{
+    font-size:22px;
+  }
+
+  .nav-links{
+    top:66px;
+    max-height:calc(100dvh - 66px);
+    padding:12px 20px 24px;
+  }
+
+  .nav-links a{
+    font-size:15px;
+    min-height:52px;
+  }
+
+  .hero{
+    min-height:100svh;
+    background-position:center center;
+  }
+
+  .hero-content{
+    min-height:calc(100svh - 66px);
+    padding:34px 18px 46px;
+    justify-content:center;
+  }
+
+  .eyebrow{
+    font-size:10px;
+    letter-spacing:3px;
+    margin-bottom:12px;
+  }
+
+  .hero .hero-names{
+    width:100%;
+    font-size:clamp(56px,18vw,76px);
+    line-height:.82;
+    margin-top:6px;
+  }
+
+  .hero .hero-names span{
+    white-space:normal;
+    text-align:center;
+  }
+
+  .hero .hero-names small{
+    font-size:.40em;
+    margin:.10em 0 .05em;
+  }
+
+  .date{
+    font-size:18px;
+    letter-spacing:3.5px;
+    margin:22px 0;
+  }
+
+  .hero .btn.primary{
+    width:min(100%,320px);
+    min-height:50px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  .section{
+    padding:62px 18px;
+  }
+
+  .section-kicker{
+    font-size:10px;
+    letter-spacing:3px;
+  }
+
+  h2{
+    font-size:clamp(36px,12vw,48px);
+    margin-bottom:18px;
+  }
+
+  .lead{
+    font-size:20px;
+    line-height:1.45;
+  }
+
+  /* Story / family sections */
+  .story-layout,
+  .family-layout{
+    grid-template-columns:1fr !important;
+    gap:22px;
+  }
+
+  .story-photo,
+  .family-photo,
+  .rings-band,
+  .photo-interlude-image{
+    border-radius:20px;
+  }
+
+  .story-copy,
+  .family-copy{
+    padding:0;
+  }
+
+  .story-copy p,
+  .family-copy p{
+    font-size:15px;
+  }
+
+  /* Approved quote banner: keep couple visible and text readable */
+  .cinema-band{
+    min-height:0;
+  }
+
+  .cinema-band > img{
+    width:100%;
+    height:auto;
+    object-fit:contain;
+    object-position:center center;
+  }
+
+  .cinema-band .cinema-copy{
+    left:16px;
+    right:16px;
+    bottom:20px;
+  }
+
+  .cinema-band .cinema-copy p{
+    font-size:clamp(27px,8.4vw,34px);
+    line-height:1.10;
+    max-width:92%;
+  }
+
+  .cinema-band .cinema-copy span{
+    font-size:8px;
+    letter-spacing:2.5px;
+  }
+
+  /* Extra photo section */
+  .photo-interlude{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:16px;
+    padding:0 18px 62px;
+  }
+
+  .photo-interlude-image{
+    min-height:0;
+    aspect-ratio:4/5;
+  }
+
+  .photo-interlude-image img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    object-position:center center;
+  }
+
+  .photo-interlude-copy{
+    padding:28px 20px;
+    border-radius:20px;
+  }
+
+  .photo-interlude-copy p:last-child{
+    font-size:24px;
+  }
+
+  /* Padrinhos */
+  .godparents{
+    padding-left:16px;
+    padding-right:16px;
+  }
+
+  .godparents-grid{
+    grid-template-columns:1fr;
+    gap:16px;
+  }
+
+  .godparent-card{
+    border-radius:20px;
+    padding:18px 14px;
+  }
+
+  .pair{
+    max-width:320px;
+    margin-left:auto;
+    margin-right:auto;
+  }
+
+  .pair img,
+  .photo-placeholder{
+    height:160px;
+  }
+
+  .godparent-card strong{
+    font-size:18px;
+    line-height:1.25;
+  }
+
+  /* Event */
+  .event{
+    padding-left:16px;
+    padding-right:16px;
+  }
+
+  .event-card{
+    padding:30px 18px;
+    border-radius:20px;
+  }
+
+  .event-grid{
+    grid-template-columns:1fr;
+    gap:12px;
+  }
+
+  .event-grid div{
+    padding:18px 16px;
+    border-left:0;
+    border-top:2px solid var(--olive);
+    background:rgba(255,255,255,.42);
+    border-radius:14px;
+  }
+
+  .event-grid strong{
+    font-size:22px;
+  }
+
+  .event-shortcuts{
+    gap:8px;
+    margin-bottom:20px;
+  }
+
+  .event-shortcuts a{
+    flex:1 1 140px;
+    min-height:44px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+  }
+
+  .map-link{
+    min-height:42px;
+    display:inline-flex;
+    align-items:center;
+  }
+
+  /* Gifts */
+  .gifts{
+    padding-left:14px;
+    padding-right:14px;
+  }
+
+  .filters{
+    display:flex;
+    overflow-x:auto;
+    flex-wrap:nowrap;
+    gap:8px;
+    padding:4px 4px 10px;
+    margin-left:-4px;
+    margin-right:-4px;
+    scrollbar-width:none;
+  }
+
+  .filters::-webkit-scrollbar{display:none}
+
+  .filter{
+    flex:0 0 auto;
+    min-height:42px;
+    white-space:nowrap;
+  }
+
+  .gift-grid{
+    grid-template-columns:1fr;
+    gap:16px;
+    margin-top:28px;
+  }
+
+  .gift-card{
+    border-radius:20px;
+    padding:0;
+    overflow:hidden;
+  }
+
+  .gift-photo{
+    aspect-ratio:16/10;
+  }
+
+  .gift-photo img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+  }
+
+  .gift-body{
+    padding:22px 18px 20px;
+    width:100%;
+  }
+
+  .gift-card h3{
+    font-size:25px;
+  }
+
+  .gift-card p{
+    min-height:0;
+    font-size:14px;
+  }
+
+  .gift-card .btn{
+    width:100%;
+    min-height:48px;
+  }
+
+  .custom-card{
+    max-width:none;
+    width:100%;
+  }
+
+  .custom-input{
+    min-height:48px;
+    font-size:16px;
+  }
+
+  /* Payment modal */
+  .modal{
+    padding:10px;
+    align-items:end;
+  }
+
+  .modal-card{
+    width:100%;
+    max-width:none;
+    max-height:92dvh;
+    border-radius:22px 22px 0 0;
+    padding:26px 18px calc(22px + env(safe-area-inset-bottom));
+  }
+
+  .close{
+    right:12px;
+    top:8px;
+    width:44px;
+    height:44px;
+  }
+
+  .selected-gift{
+    flex-direction:column;
+    gap:4px;
+  }
+
+  /* Closing/footer */
+  .closing{
+    min-height:420px;
+  }
+
+  .closing-copy{
+    padding:30px 18px;
+  }
+
+  footer{
+    padding:38px 18px calc(38px + env(safe-area-inset-bottom));
+  }
+
+  .footer-names{
+    font-size:38px;
+  }
+}
+
+/* Very small phones */
+@media(max-width:380px){
+  .hero .hero-names{
+    font-size:52px;
+  }
+
+  .date{
+    font-size:16px;
+    letter-spacing:2.6px;
+  }
+
+  .cinema-band .cinema-copy p{
+    font-size:25px;
+  }
+
+  .pair img,
+  .photo-placeholder{
+    height:145px;
+  }
+}
+
+
+/* ==========================================================
+   V9 — correções mobile após teste real em Android/WhatsApp
+   ========================================================== */
+
+/* Melhor ponto de parada ao clicar em links de navegação */
+@media(max-width:600px){
+
+  /* Capa mobile: prioriza o casal no enquadramento */
+  .hero{
+    background-position:68% center;
+  }
+
+  /* Filtros da lista de presentes: sem corte/rolagem horizontal */
+  .filters{
+    display:flex;
+    flex-wrap:wrap;
+    overflow:visible;
+    gap:8px;
+    padding:0;
+    margin:18px 0 22px;
+    justify-content:center;
+  }
+
+  .filter{
+    flex:1 1 calc(50% - 8px);
+    max-width:calc(50% - 4px);
+    min-width:0;
+    min-height:42px;
+    padding:10px 8px;
+    white-space:normal;
+    text-align:center;
+    line-height:1.15;
+  }
+
+  .gifts,
+  .gift-grid,
+  .gift-card,
+  .gift-body{
+    min-width:0;
+    max-width:100%;
+  }
+
+  /* O Grande Dia sem atalhos extras */
+  .event-shortcuts{
+    display:none !important;
+  }
+}
+
+@media(max-width:360px){
+  .filter{
+    flex-basis:100%;
+    max-width:100%;
+  }
+}
+
+
+/* ==========================================================
+   V10 — correção definitiva de navegação por âncoras
+   ========================================================== */
+
+/* Não existe cabeçalho fixo fora da capa; portanto a seção deve
+   encostar exatamente no topo ao ser acionada por um botão/menu. */
+section[id],
+header[id]{
+  scroll-margin-top:0 !important;
+}
+
+
+/* ==========================================================
+   V11 — refinamento exclusivo da seção Família no mobile
+   Desktop permanece inalterado.
+   ========================================================== */
+
+@media(max-width:600px){
+  /* seção família vira um bloco contínuo e mais editorial */
+  .family{
+    padding-top:34px;
+    padding-bottom:58px;
+  }
+
+  .family-layout{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    gap:0 !important;
+  }
+
+  .family-photo{
+    width:calc(100% + 4px);
+    margin-left:-2px;
+    border-radius:20px;
+    overflow:hidden;
+    box-shadow:var(--shadow);
+  }
+
+  .family-photo img{
+    display:block;
+    width:100%;
+    height:auto !important;
+    aspect-ratio:auto !important;
+    object-fit:contain !important;
+    object-position:center center !important;
+  }
+
+  .family-copy{
+    padding:26px 2px 0 !important;
+  }
+
+  .family-copy .section-kicker{
+    margin-bottom:10px;
+    text-align:left;
+  }
+
+  .family-copy h2{
+    margin:0 0 18px;
+    font-size:clamp(42px,14vw,56px);
+    line-height:.94;
+    text-align:left;
+  }
+
+  .family-copy .lead,
+  .family-copy p{
+    text-align:left;
+  }
+
+  .family-copy .lead{
+    margin-bottom:18px;
+  }
+}
+
+
+/* ==========================================================
+   V12 — correção do espaço vazio na seção Família (mobile)
+   ========================================================== */
+
+@media(max-width:600px){
+  .family{
+    align-items:start !important;
+  }
+
+  .family-photo{
+    min-height:0 !important;
+    height:auto !important;
+    align-self:start !important;
+  }
+
+  .family-photo img{
+    height:auto !important;
+    min-height:0 !important;
+    display:block !important;
+  }
+}
+
+
+/* ==========================================================
+   V15 — estabilização
+   Base: V13 estável. Sem transform no hero-content.
+   ========================================================== */
+
+@media(max-width:600px){
+  /*
+    A capa continua ocupando exatamente 100svh.
+    O bloco é posicionado de forma absoluta dentro dela,
+    portanto não altera a altura da página nem as âncoras.
+  */
+  .hero{
+    position:relative;
+    min-height:100svh;
+    background-position:68% center;
+    overflow:hidden;
+  }
+
+  .hero-content{
+    position:absolute !important;
+    z-index:2;
+    top:43% !important;
+    bottom:auto !important;
+    left:14px !important;
+    right:auto !important;
+    width:74% !important;
+    max-width:320px !important;
+    min-height:0 !important;
+    height:auto !important;
+
+    transform:none !important;
+    padding:0 !important;
+    margin:0 !important;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-start !important;
+    align-items:flex-start !important;
+    text-align:left !important;
+    background:none !important;
+  }
+
+  .hero-content .eyebrow{
+    width:100%;
+    margin:0 0 7px !important;
+    font-size:9px;
+    letter-spacing:2.6px;
+    text-align:left;
+  }
+
+  .hero .hero-names{
+    width:100% !important;
+    margin:0 !important;
+    font-size:clamp(52px,15.5vw,64px) !important;
+    line-height:.80 !important;
+    align-items:center;
+  }
+
+  .hero .hero-names span{
+    width:100%;
+    text-align:center !important;
+  }
+
+  .hero .hero-names small{
+    margin:.06em 0 .02em !important;
+    font-size:.38em !important;
+  }
+
+  .hero-content .date{
+    margin:14px 0 14px !important;
+    font-size:15px !important;
+    letter-spacing:3.4px !important;
+    white-space:nowrap;
+  }
+
+  .hero .btn.primary{
+    width:100% !important;
+    min-height:44px !important;
+    padding:11px 14px !important;
+    font-size:11px;
+  }
+}
+
+/* Telefones baixos: compacta o conjunto sem mover o fluxo da página */
+@media(max-width:600px) and (max-height:700px){
+  .hero-content{
+    top:39% !important;
+    width:76% !important;
+  }
+
+  .hero .hero-names{
+    font-size:clamp(48px,14.5vw,58px) !important;
+  }
+
+  .hero-content .date{
+    margin:10px 0 11px !important;
+    font-size:14px !important;
+  }
+
+  .hero .btn.primary{
+    min-height:42px !important;
+    padding:9px 12px !important;
+  }
+}
+
+/* Segurança: nenhuma versão anterior pode deslocar visualmente o bloco */
+@media(max-width:600px){
+  .hero-content{
+    translate:none !important;
+  }
+}
+
+
+/* ==========================================================
+   V16 — mobile final: header compacto + capa + botão TOPO
+   Desktop preservado.
+   ========================================================== */
+@media(max-width:600px){
+  /* Cabeçalho validado: compacto, T & L à esquerda e menu à direita */
+  .topbar{
+    height:64px !important;
+    min-height:64px !important;
+    padding:0 20px !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+    background:
+      linear-gradient(rgba(24,31,20,.64),rgba(24,31,20,.64)),
+      var(--hero) center 18%/cover no-repeat !important;
+    backdrop-filter:blur(7px);
+    -webkit-backdrop-filter:blur(7px);
+  }
+
+  .brand{
+    margin:0 !important;
+    padding:0 !important;
+    font-size:17px !important;
+    letter-spacing:5px !important;
+    line-height:1 !important;
+  }
+
+  .menu-btn{
+    width:36px !important;
+    height:36px !important;
+    margin:0 !important;
+    padding:0 !important;
+    display:grid !important;
+    place-items:center !important;
+    font-size:28px !important;
+    line-height:1 !important;
+  }
+
+  /* Mantém o menu abaixo do cabeçalho, sem alterar sua altura */
+  .mobile-menu{
+    top:64px !important;
+  }
+
+  /* Capa: sem transform. O bloco desce dentro do hero sem alterar âncoras. */
+  .hero-content{
+    transform:none !important;
+    translate:none !important;
+    top:52% !important;
+    left:14px !important;
+    right:auto !important;
+    width:78% !important;
+    max-width:330px !important;
+  }
+
+  /* Botão fixo para retorno ao topo */
+  .back-to-top{
+    position:fixed;
+    right:16px;
+    bottom:22px;
+    z-index:80;
+    width:58px;
+    height:58px;
+    border:1px solid rgba(255,255,255,.78);
+    border-radius:50%;
+    background:rgba(75,91,55,.94);
+    color:#fff;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:0;
+    box-shadow:0 6px 20px rgba(0,0,0,.22);
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    transition:opacity .2s ease, visibility .2s ease;
+  }
+
+  .back-to-top.show{
+    opacity:1;
+    visibility:visible;
+    pointer-events:auto;
+  }
+
+  .back-to-top span{
+    font-size:25px;
+    line-height:.72;
+    font-family:Arial,sans-serif;
+  }
+
+  .back-to-top small{
+    margin-top:4px;
+    font-size:8px;
+    letter-spacing:1.3px;
+    color:#fff;
+  }
+}
+
+@media(min-width:601px){
+  .back-to-top{ display:none !important; }
+}
+
+/* Em aparelhos baixos, desce o suficiente para liberar os rostos,
+   mas mantém data e botão dentro da primeira tela. */
+@media(max-width:600px) and (max-height:700px){
+  .hero-content{
+    top:47% !important;
+    width:78% !important;
+  }
+}
+
+
+/* ==========================================================
+   V17 — Nossa História
+   ========================================================== */
+#historia .story-quote,
+#historia .quote,
+#historia .script,
+#historia .handwritten{
+  display:block;
+  width:100%;
+  max-width:780px;
+  margin-left:auto !important;
+  margin-right:auto !important;
+  text-align:center !important;
+  padding-left:18px;
+  padding-right:18px;
+  box-sizing:border-box;
+  text-indent:0 !important;
+}
+
+#historia .story-paragraph{
+  line-height:1.75;
+}
+
+/* Mobile: frase centralizada e com respiro suficiente para as aspas */
+@media(max-width:600px){
+  #historia .story-quote,
+  #historia .quote,
+  #historia .script,
+  #historia .handwritten{
+    padding:0 20px !important;
+    text-align:center !important;
+    line-height:1.08 !important;
+  }
+
+  #historia .story-paragraph{
+    text-align:left;
+    line-height:1.72;
+  }
+}
+
+
+/* ==========================================================
+   VERSÃO FINAL — refinamentos aprovados
+   ========================================================== */
+
+/* Nossa História: centralização efetiva da frase de abertura */
+#historia blockquote{
+  display:block;
+  width:100%;
+  max-width:780px;
+  margin:0 auto 26px !important;
+  padding:0 20px !important;
+  box-sizing:border-box;
+  text-align:center !important;
+  text-indent:0 !important;
+}
+
+/* Fotos finais de Ludmila e Juninho seguem o padrão dos padrinhos */
+.godparent-card .pair img{
+  object-fit:cover;
+  object-position:center 24%;
+}
+
+/* Desktop permanece como estava. Ajustes abaixo são exclusivamente mobile. */
+@media(max-width:600px){
+  /* Cabeçalho validado */
+  .nav{
+    height:64px !important;
+    min-height:64px !important;
+    padding:0 20px !important;
+    align-items:center !important;
+  }
+
+  .brand{
+    margin:0 !important;
+    font-size:17px !important;
+    letter-spacing:5px !important;
+    line-height:1 !important;
+  }
+
+  .menu-btn{
+    width:36px !important;
+    height:36px !important;
+    margin:0 !important;
+    padding:0 !important;
+    font-size:28px !important;
+    line-height:1 !important;
+  }
+
+  .nav-links{
+    top:64px !important;
+  }
+
+  /* Capa: nomes/data mais baixos e centralizados, sem alterar o fluxo */
+  .hero-content{
+    position:absolute !important;
+    top:57% !important;
+    left:9% !important;
+    right:9% !important;
+    width:auto !important;
+    max-width:none !important;
+    min-height:0 !important;
+    height:auto !important;
+    padding:0 !important;
+    margin:0 !important;
+    transform:none !important;
+    translate:none !important;
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:flex-start !important;
+    text-align:center !important;
+  }
+
+  .hero-content .eyebrow{
+    width:100%;
+    text-align:center !important;
+    margin:0 0 8px !important;
+  }
+
+  .hero .hero-names{
+    width:100% !important;
+    align-items:center !important;
+    margin:0 !important;
+  }
+
+  .hero .hero-names span,
+  .hero-content .date{
+    width:100%;
+    text-align:center !important;
+  }
+
+  .hero-content .date{
+    margin:14px 0 0 !important;
+  }
+
+  /* Pedido final: retirar apenas o botão da capa no celular */
+  .hero-content > .btn.primary{
+    display:none !important;
+  }
+
+  /* Frase da história no padrão aprovado */
+  #historia blockquote{
+    text-align:center !important;
+    padding:0 18px !important;
+    margin-bottom:24px !important;
+  }
+}
+
+/* Telefones baixos: mantém o conjunto visível sem voltar a sobrepor os rostos */
+@media(max-width:600px) and (max-height:700px){
+  .hero-content{
+    top:53% !important;
+  }
+}
+
+
+/* ==========================================================
+   Fotos HD — ajuste pontual de enquadramento do Daniel no mobile
+   A imagem original não é cortada nem alterada; apenas o ponto focal do card.
+   ========================================================== */
+@media(max-width:600px){
+  img[src*="padrinhos/daniel.jpeg"]{
+    object-position:58% center !important;
+  }
+}
+
+
+/* ==========================================================
+   Mercado Pago TESTE — Checkout Pro via Orders API
+   ========================================================== */
+.checkout-pro-box{
+  display:grid;
+  gap:14px;
+  text-align:center;
+  padding:8px 2px;
+}
+.checkout-pro-box strong{
+  font-family:"Cormorant Garamond",serif;
+  font-size:27px;
+}
+.checkout-pro-box p{
+  margin:0;
+  color:var(--muted);
+  line-height:1.55;
+}
+.checkout-pro-box small{
+  color:var(--muted);
+  font-size:11px;
+}
+.checkout-pro-btn{
+  width:100%;
+  min-height:48px;
+}
+.checkout-pro-btn:disabled{
+  opacity:.65;
+  cursor:wait;
+  transform:none;
+}
+.payment-return{
+  position:fixed;
+  left:50%;
+  top:22px;
+  transform:translateX(-50%);
+  z-index:200;
+  width:min(92vw,520px);
+  padding:18px 48px 18px 20px;
+  display:grid;
+  gap:4px;
+  border-radius:16px;
+  background:#fff;
+  color:var(--ink);
+  box-shadow:0 18px 50px rgba(0,0,0,.2);
+  border-left:5px solid var(--olive);
+}
+.payment-return strong{
+  font-family:"Cormorant Garamond",serif;
+  font-size:24px;
+  line-height:1.1;
+}
+.payment-return span{
+  font-size:13px;
+  color:var(--muted);
+}
+.payment-return-failure{border-left-color:#9b4848}
+.payment-return-pending{border-left-color:#b99a63}
+.payment-return-close{
+  position:absolute;
+  right:12px;
+  top:8px;
+  border:0;
+  background:none;
+  font-size:27px;
+  color:var(--muted);
+  cursor:pointer;
+}

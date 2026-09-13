@@ -1,0 +1,174 @@
+require("dotenv").config();
+const express = require("express");
+const path = require("path");
+const crypto = require("crypto");
+
+const app = express();
+const PORT = Number(process.env.PORT || 3000);
+const DEFAULT_BASE_URL = "https://casamento-taiane-laudezir.onrender.com";
+
+app.set("trust proxy", 1);
+app.use(express.json());
+app.use(express.static(path.join(__dirname, "public")));
+
+const gifts = {
+  "cafe-manha": { name: "Café da manhã dos recém-casados", value: 50 },
+  "drinks": { name: "Drinks na lua de mel", value: 80 },
+  "sobremesa": { name: "Sobremesa especial", value: 100 },
+  "brinde": { name: "Um brinde aos recém-casados", value: 120 },
+  "jantar-romantico": { name: "Jantar romântico", value: 150 },
+  "malas": { name: "Ajuda com as malas", value: 180 },
+  "passeio-turistico": { name: "Passeio turístico", value: 200 },
+  "dia-praia": { name: "Dia especial na praia", value: 250 },
+  "jantar-vinho": { name: "Jantar especial com vinho", value: 300 },
+  "transfer": { name: "Transfer dos recém-casados", value: 350 },
+  "diaria": { name: "Uma diária da lua de mel", value: 400 },
+  "relax": { name: "Momento relax para o casal", value: 450 },
+  "upgrade": { name: "Upgrade da hospedagem", value: 500 },
+  "barco": { name: "Passeio especial de barco", value: 600 },
+  "passagens": { name: "Ajuda com as passagens", value: 700 },
+  "experiencia-romantica": { name: "Experiência romântica", value: 800 },
+  "experiencia-inesquecivel": { name: "Experiência inesquecível", value: 1000 },
+  "lua-de-mel": { name: "Ajuda com a lua de mel", value: 1200 },
+  "superpresente": { name: "Superpresente dos recém-casados", value: 1500 }
+};
+
+function getBaseUrl(req) {
+  const configured = String(process.env.BASE_URL || "").trim().replace(/\/+$/, "");
+  if (configured) return configured;
+
+  const host = req.get("host");
+  if (host && !host.includes("localhost") && !host.startsWith("127.")) {
+    return `https://${host}`;
+  }
+  return DEFAULT_BASE_URL;
+}
+
+function getGift(giftId, customAmount) {
+  if (giftId === "custom") {
+    const amount = Number(customAmount);
+    if (!Number.isFinite(amount) || amount < 10 || amount > 10000) {
+      return { error: "O valor livre deve estar entre R$ 10,00 e R$ 10.000,00." };
+    }
+    return {
+      gift: { name: "Presente livre", value: Math.round(amount * 100) / 100 },
+      amount: Math.round(amount * 100) / 100
+    };
+  }
+
+  const gift = gifts[giftId];
+  if (!gift) return { error: "Presente não encontrado." };
+  return { gift, amount: gift.value };
+}
+
+app.get("/api/health", (req, res) => {
+  const token = String(process.env.MP_ACCESS_TOKEN || "");
+  res.json({
+    ok: true,
+    version: "19.0.0-mp-test",
+    mercadoPagoConfigured: Boolean(token && token !== "SEU_ACCESS_TOKEN_AQUI")
+  });
+});
+
+app.post("/api/checkout/order", async (req, res) => {
+  try {
+    const accessToken = String(process.env.MP_ACCESS_TOKEN || "").trim();
+
+    if (!accessToken || accessToken === "SEU_ACCESS_TOKEN_AQUI") {
+      return res.status(503).json({
+        message: "A credencial do Mercado Pago ainda não está configurada no servidor."
+      });
+    }
+
+    const { giftId, customAmount } = req.body || {};
+    const resolved = getGift(giftId, customAmount);
+
+    if (resolved.error) {
+      return res.status(400).json({ message: resolved.error });
+    }
+
+    const { gift, amount } = resolved;
+    const amountText = amount.toFixed(2);
+    const baseUrl = getBaseUrl(req);
+    const reference = `TL-${giftId}-${Date.now()}`.slice(0, 64);
+
+    const payload = {
+      type: "online",
+      processing_mode: "manual",
+      capture_mode: "automatic_async",
+      total_amount: amountText,
+      external_reference: reference,
+      description: `Presente de casamento - ${gift.name}`,
+      config: {
+        online: {
+          success_url: `${baseUrl}/?payment_result=success`,
+          failure_url: `${baseUrl}/?payment_result=failure`,
+          pending_url: `${baseUrl}/?payment_result=pending`,
+          auto_return: "approved"
+        }
+      },
+      items: [
+        {
+          external_code: `GIFT-${giftId}`.slice(0, 50),
+          title: gift.name,
+          description: `Presente para Taiane e Laudezir`,
+          quantity: 1,
+          unit_price: amountText
+        }
+      ]
+    };
+
+    const mpResponse = await fetch("https://api.mercadopago.com/v1/orders", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+        "X-Idempotency-Key": crypto.randomUUID()
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const result = await mpResponse.json().catch(() => ({}));
+
+    if (!mpResponse.ok) {
+      console.error("Mercado Pago Orders API:", result);
+      return res.status(mpResponse.status).json({
+        message: "O Mercado Pago não conseguiu criar o checkout.",
+        code: result.code || result.error || null,
+        details: result.message || result.error || "Verifique a credencial e tente novamente."
+      });
+    }
+
+    if (!result.checkout_url) {
+      console.error("Order criada sem checkout_url:", result);
+      return res.status(502).json({
+        message: "A ordem foi criada, mas o Mercado Pago não retornou o endereço do checkout."
+      });
+    }
+
+    return res.status(201).json({
+      orderId: result.id,
+      status: result.status,
+      checkoutUrl: result.checkout_url
+    });
+  } catch (error) {
+    console.error("Erro ao criar order:", error);
+    return res.status(500).json({
+      message: "Erro interno ao iniciar o pagamento."
+    });
+  }
+});
+
+// Endpoint reservado para a próxima etapa: confirmação automática por Webhook.
+// Nesta versão de TESTE ele apenas confirma o recebimento.
+app.post("/api/webhooks/mercadopago", (req, res) => {
+  console.log("Webhook Mercado Pago recebido:", {
+    query: req.query,
+    body: req.body
+  });
+  res.sendStatus(200);
+});
+
+app.listen(PORT, () => {
+  console.log(`Site: http://localhost:${PORT}`);
+});
