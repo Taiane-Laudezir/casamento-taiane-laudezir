@@ -1,8 +1,8 @@
 {
   "name": "casamento-taiane-laudezir",
-  "version": "18.2.0",
+  "version": "18.3.0",
   "private": true,
-  "description": "Site final do casamento de Taiane e Laudezir — fotos tratadas em alta qualidade",
+  "description": "Site final do casamento de Taiane e Laudezir — última versão antes do Mercado Pago",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js"
