@@ -1,8 +1,8 @@
 {
   "name": "casamento-taiane-laudezir",
-  "version": "18.1.0",
+  "version": "18.2.0",
   "private": true,
-  "description": "Site final do casamento de Taiane e Laudezir — refinamento final Nossa Família",
+  "description": "Site final do casamento de Taiane e Laudezir — fotos tratadas em alta qualidade",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js"

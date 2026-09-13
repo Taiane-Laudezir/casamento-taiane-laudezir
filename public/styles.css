@@ -1471,3 +1471,14 @@ header[id]{
     top:53% !important;
   }
 }
+
+
+/* ==========================================================
+   Fotos HD — ajuste pontual de enquadramento do Daniel no mobile
+   A imagem original não é cortada nem alterada; apenas o ponto focal do card.
+   ========================================================== */
+@media(max-width:600px){
+  img[src*="padrinhos/daniel.jpeg"]{
+    object-position:58% center !important;
+  }
+}

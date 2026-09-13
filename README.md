@@ -1,13 +1,16 @@
-# Casamento T&L — VERSÃO FINALÍSSIMA
+# Casamento T&L — FINAL FOTOS HD
 
-Estrutura final aprovada preservada.
+Base: versão finalíssima aprovada.
 
-## Últimos ajustes solicitados
-- seção **Nossa Família**: removido somente o texto complementar;
-- permanecem a foto, `NOSSA FAMÍLIA` e `O nosso maior presente.`;
-- removida somente a opção **Nossa Família** do menu hambúrguer;
-- a seção continua aparecendo normalmente durante a rolagem;
-- nenhum outro layout, botão, seção ou comportamento foi alterado.
+## Tratamento aplicado
+- nenhuma fotografia foi recriada;
+- nenhuma pessoa, rosto, roupa ou fundo foi alterado;
+- enquadramentos originais preservados;
+- fotos principais regravadas em JPEG de alta qualidade com nitidez conservadora;
+- fotos pequenas dos padrinhos receberam ampliação proporcional de resolução e nitidez;
+- PNGs dos padrinhos foram preservados como PNG;
+- Daniel recebeu apenas ajuste de `object-position` no mobile para melhorar a centralização;
+- estrutura, textos, menu e layout permanecem iguais à versão finalíssima.
 
 Commit sugerido:
-`Finalissima - simplifica Nossa Familia`
+`Final - tratamento HD das fotos`
