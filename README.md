@@ -1,40 +1,23 @@
-# Casamento T&L — PIX DIRETO + CARTÃO
+# Casamento T&L — Mercado Pago Orders FIX
 
-## Fluxo de pagamento
+Correção após o Render registrar:
 
-### PIX
-O Pix é exibido dentro do próprio site:
-- QR Code;
-- chave Pix aleatória;
-- botão `Copiar chave`;
-- Pix Copia e Cola;
-- valor preenchido automaticamente conforme o presente selecionado.
+`unsupported_properties / Properties not supported`
 
-**Atenção:** este Pix aponta para a chave real informada pelo casal. Um pagamento
-feito por esse QR Code é uma transferência real, mesmo enquanto o Mercado Pago
-ainda está usando credenciais de teste.
+## Diagnóstico
+O Access Token chegou ao Mercado Pago; a API rejeitou propriedades do corpo da Order.
 
-### CARTÃO DE CRÉDITO
-O botão `Pagar com cartão` cria uma Order no Checkout Pro e redireciona o convidado
-ao Mercado Pago.
+## O que mudou
+- payload da Order simplificado para os campos documentados;
+- item agora inclui `unit_measure: "unit"` e `total_amount`;
+- removidos temporariamente campos opcionais de captura/descrição/restrição de meios;
+- URLs de retorno mantidas;
+- log do Render passa a mostrar o JSON completo do erro caso haja nova falha;
+- Pix direto permanece inalterado.
 
-O Checkout Pro foi configurado para:
-- priorizar cartão de crédito;
-- excluir Pix (`bank_transfer`);
-- excluir boleto (`ticket`);
-- excluir cartão de débito (`debit_card`).
+## Importante
+Nesta versão de validação o Checkout Pro pode mostrar outros meios de pagamento além do cartão.
+Primeiro confirmamos que a Order é criada. Depois reativamos as restrições uma a uma.
 
-A conta Mercado Pago/saldo pode ainda aparecer quando o próprio Mercado Pago não
-permite sua exclusão.
-
-## Segurança
-- Access Token continua somente no Render;
-- valores dos presentes fixos são validados no servidor;
-- Orders usam `X-Idempotency-Key`;
-- a chave Pix é pública por natureza nesta modalidade e aparece no site.
-
-## Dependência adicionada
-`qrcode` para gerar o QR Code Pix no servidor.
-
-## Commit sugerido
-`Pix direto e cartao Mercado Pago`
+Commit sugerido:
+`Corrige Orders API Mercado Pago`

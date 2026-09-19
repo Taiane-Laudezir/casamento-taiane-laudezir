@@ -178,31 +178,25 @@ app.post("/api/checkout/order", async (req, res) => {
     const payload = {
       type: "online",
       processing_mode: "manual",
-      capture_mode: "automatic_async",
       total_amount: amountText,
       external_reference: reference,
-      description: `Presente de casamento - ${gift.name}`,
+      items: [
+        {
+          title: gift.name,
+          quantity: 1,
+          unit_price: amountText,
+          unit_measure: "unit",
+          total_amount: amountText
+        }
+      ],
       config: {
         online: {
           success_url: `${baseUrl}/?payment_result=success`,
           failure_url: `${baseUrl}/?payment_result=failure`,
           pending_url: `${baseUrl}/?payment_result=pending`,
           auto_return: "approved"
-        },
-        payment_method: {
-          default_type: "credit_card",
-          not_allowed_types: ["bank_transfer", "ticket", "debit_card"]
         }
-      },
-      items: [
-        {
-          external_code: `GIFT-${giftId}`.slice(0, 50),
-          title: gift.name,
-          description: `Presente para Taiane e Laudezir`,
-          quantity: 1,
-          unit_price: amountText
-        }
-      ]
+      }
     };
 
     const mpResponse = await fetch("https://api.mercadopago.com/v1/orders", {
@@ -218,7 +212,7 @@ app.post("/api/checkout/order", async (req, res) => {
     const result = await mpResponse.json().catch(() => ({}));
 
     if (!mpResponse.ok) {
-      console.error("Mercado Pago Orders API:", result);
+      console.error("Mercado Pago Orders API:", JSON.stringify(result, null, 2));
       return res.status(mpResponse.status).json({
         message: "O Mercado Pago não conseguiu criar o checkout.",
         code: result.code || result.error || null,
