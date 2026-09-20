@@ -1,8 +1,8 @@
 {
   "name": "casamento-taiane-laudezir",
-  "version": "20.1.0",
+  "version": "20.2.0",
   "private": true,
-  "description": "Casamento Taiane e Laudezir — correção Orders API Mercado Pago",
+  "description": "Casamento Taiane e Laudezir — correção do schema dos itens Mercado Pago",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js"

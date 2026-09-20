@@ -184,9 +184,7 @@ app.post("/api/checkout/order", async (req, res) => {
         {
           title: gift.name,
           quantity: 1,
-          unit_price: amountText,
-          unit_measure: "unit",
-          total_amount: amountText
+          unit_price: amountText
         }
       ],
       config: {

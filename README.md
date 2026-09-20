@@ -1,23 +1,22 @@
-# Casamento T&L — Mercado Pago Orders FIX
+# Casamento T&L — Mercado Pago FIX ITEMS
 
-Correção após o Render registrar:
+Correção baseada no erro real devolvido pela API:
 
-`unsupported_properties / Properties not supported`
+`$.items[0] - additionalProperties 'unit_measure', 'total_amount' not allowed`
 
-## Diagnóstico
-O Access Token chegou ao Mercado Pago; a API rejeitou propriedades do corpo da Order.
+## Alteração
+Foram removidos dos itens da Order:
+- `unit_measure`
+- `total_amount`
 
-## O que mudou
-- payload da Order simplificado para os campos documentados;
-- item agora inclui `unit_measure: "unit"` e `total_amount`;
-- removidos temporariamente campos opcionais de captura/descrição/restrição de meios;
-- URLs de retorno mantidas;
-- log do Render passa a mostrar o JSON completo do erro caso haja nova falha;
-- Pix direto permanece inalterado.
+O item agora envia somente:
+- `title`
+- `quantity`
+- `unit_price`
 
-## Importante
-Nesta versão de validação o Checkout Pro pode mostrar outros meios de pagamento além do cartão.
-Primeiro confirmamos que a Order é criada. Depois reativamos as restrições uma a uma.
+O `total_amount` da Order continua sendo enviado normalmente no nível principal.
+
+Pix direto permanece inalterado.
 
 Commit sugerido:
-`Corrige Orders API Mercado Pago`
+`Corrige itens da Order Mercado Pago`
