@@ -149,7 +149,7 @@ function renderCheckoutPro() {
           <strong>Pagar com cartão de crédito</strong>
           <p>Você será direcionado ao ambiente seguro do Mercado Pago para preencher os dados do cartão.</p>
           <button class="btn checkout-pro-btn" id="startCheckoutBtn">Pagar com cartão</button>
-          <small>Integração Mercado Pago em ambiente de teste nesta etapa.</small>
+          <small>Pagamento seguro processado pelo Mercado Pago.</small>
         </div>
       </div>
     </div>`;
@@ -283,7 +283,7 @@ function showPaymentReturnMessage() {
   const messages = {
     success: {
       title: "Obrigado pelo presente!",
-      text: "O Mercado Pago informou que o pagamento foi concluído. Na próxima etapa ativaremos também a confirmação automática por Webhook."
+      text: "O Mercado Pago informou que o pagamento foi concluído. Obrigado pelo presente!"
     },
     pending: {
       title: "Pagamento pendente",

@@ -1,38 +1,36 @@
-# Casamento T&L — validação de Orders de teste pela API
+# Casamento T&L — versão limpa para produção
 
-## O que muda
+Esta versão remove diagnósticos temporários de Webhook e textos de ambiente de teste.
 
-O SDK oficial continua sendo usado para validar Webhooks normalmente.
+## Variáveis esperadas no Render
 
-Se uma notificação REAL de teste (`ORDTST...`) falhar na assinatura,
-o servidor consulta diretamente:
+Somente estas duas são usadas pelo código:
 
-`GET /v1/orders/{id}`
+- `MP_ACCESS_TOKEN`
+- `MP_WEBHOOK_SECRET`
 
-usando `MP_ACCESS_TOKEN` de teste.
+Durante a etapa de teste, `MP_ACCESS_TOKEN` pode continuar sendo o token TEST.
+Ao entrar em produção, substitua por Access Token de produção e use a assinatura
+secreta cadastrada em Webhooks > Modo de produção.
 
-A Order só é aceita se a API retornar exatamente o mesmo ID.
+## Webhook
 
-## Segurança
+- Validação principal: SDK oficial do Mercado Pago.
+- Notificação válida: consulta a Order em `/v1/orders/{id}` para confirmar estado.
+- Fallback para assinatura inválida: existe somente quando o Access Token começa
+  por `TEST-` e o ID começa por `ORDTST`.
+- Em produção, assinatura inválida é sempre rejeitada.
 
-- `ORDTST...` → pode ser confirmada pela API do Mercado Pago durante os testes.
-- `ORD...` de produção → NÃO possui fallback e continua exigindo assinatura válida.
-- Nenhuma chave é exposta nos logs.
+## Endpoint de saúde
 
-## Log esperado
+`/api/health` informa apenas se Mercado Pago e Webhook estão configurados.
+Não lista nomes de variáveis nem expõe valores.
 
-Após nova compra de teste:
+## Textos do site
 
-`Order de TESTE confirmada pela API`
-
-O status esperado para pagamento aprovado é:
-
-`processed`
-
-com detalhe:
-
-`accredited`
+Foram removidas mensagens de "ambiente de teste" e a mensagem temporária sobre
+ativar Webhook futuramente.
 
 Commit sugerido:
 
-`Valida orders de teste pela API`
+`Limpa integracao Mercado Pago para producao`

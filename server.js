@@ -150,22 +150,13 @@ app.post("/api/pix", async (req, res) => {
 
 app.get("/api/health", (req, res) => {
   const token = String(process.env.MP_ACCESS_TOKEN || "").trim();
-  const webhookLegacy = String(process.env.MP_WEBHOOK_SECRET || "").trim();
-  const webhookTest = String(process.env.MP_WEBHOOK_SECRET_TEST || "").trim();
-  const webhookProd = String(process.env.MP_WEBHOOK_SECRET_PROD || "").trim();
+  const webhookSecret = String(process.env.MP_WEBHOOK_SECRET || "").trim();
 
   res.json({
     ok: true,
-    version: "20.5.0-test-order-verify",
+    version: "21.0.0-production-ready",
     mercadoPagoConfigured: Boolean(token && token !== "SEU_ACCESS_TOKEN_AQUI"),
-    webhookSecrets: {
-      legacyConfigured: Boolean(webhookLegacy),
-      testConfigured: Boolean(webhookTest),
-      prodConfigured: Boolean(webhookProd)
-    },
-    mpEnvironmentKeys: Object.keys(process.env)
-      .filter(key => key.startsWith("MP_"))
-      .sort()
+    webhookConfigured: Boolean(webhookSecret)
   });
 });
 
@@ -255,18 +246,13 @@ app.post("/api/checkout/order", async (req, res) => {
 });
 
 function validateMercadoPagoWebhook(req) {
+  const secret = String(process.env.MP_WEBHOOK_SECRET || "").trim();
   const xSignature = String(req.get("x-signature") || "");
   const xRequestId = String(req.get("x-request-id") || "");
   const queryDataId = String(req.query["data.id"] || "");
 
-  const candidates = [
-    { label: "TEST", secret: String(process.env.MP_WEBHOOK_SECRET_TEST || "").trim() },
-    { label: "PROD", secret: String(process.env.MP_WEBHOOK_SECRET_PROD || "").trim() },
-    { label: "LEGACY", secret: String(process.env.MP_WEBHOOK_SECRET || "").trim() }
-  ].filter(item => item.secret);
-
-  if (candidates.length === 0) {
-    return { ok: false, status: 503, reason: "Nenhuma chave de Webhook configurada." };
+  if (!secret) {
+    return { ok: false, status: 503, reason: "MP_WEBHOOK_SECRET não configurado." };
   }
 
   if (!xSignature || !xRequestId || !queryDataId) {
@@ -278,45 +264,30 @@ function validateMercadoPagoWebhook(req) {
     return { ok: false, status: 400, reason: "Cabeçalhos ou data.id ausentes." };
   }
 
-  let lastSignatureError = null;
+  try {
+    WebhookSignatureValidator.validate({
+      xSignature,
+      xRequestId,
+      dataId: queryDataId,
+      secret
+    });
 
-  for (const candidate of candidates) {
-    try {
-      WebhookSignatureValidator.validate({
-        xSignature,
-        xRequestId,
-        dataId: queryDataId,
-        secret: candidate.secret
+    return { ok: true, dataId: queryDataId };
+  } catch (error) {
+    if (error instanceof InvalidWebhookSignatureError) {
+      console.warn("Webhook Mercado Pago rejeitado:", {
+        reason: error.message || "Assinatura inválida.",
+        dataId: queryDataId
       });
-
-      return {
-        ok: true,
-        dataId: queryDataId,
-        secretSource: candidate.label
-      };
-    } catch (error) {
-      if (error instanceof InvalidWebhookSignatureError) {
-        lastSignatureError = error;
-        continue;
-      }
-
-      console.error("Erro inesperado ao validar Webhook Mercado Pago:", {
-        keyTried: candidate.label,
-        name: error?.name || null,
-        message: error?.message || String(error)
-      });
-
-      return { ok: false, status: 500, reason: "Erro ao validar assinatura." };
+      return { ok: false, status: 401, reason: "Assinatura inválida." };
     }
+
+    console.error("Erro inesperado ao validar Webhook Mercado Pago:", {
+      name: error?.name || null,
+      message: error?.message || String(error)
+    });
+    return { ok: false, status: 500, reason: "Erro ao validar assinatura." };
   }
-
-  console.warn("Webhook Mercado Pago rejeitado pelo SDK oficial:", {
-    reason: lastSignatureError?.message || "Assinatura inválida.",
-    dataId: queryDataId,
-    keysTried: candidates.map(item => item.label)
-  });
-
-  return { ok: false, status: 401, reason: "Assinatura inválida." };
 }
 
 async function fetchMercadoPagoOrder(orderId) {
@@ -359,23 +330,20 @@ app.post("/api/webhooks/mercadopago", async (req, res) => {
   const validation = validateMercadoPagoWebhook(req);
   const queryDataId = String(req.query["data.id"] || "");
   const bodyDataId = String(req.body?.data?.id || "");
-  const candidateOrderId = validation.dataId || queryDataId || bodyDataId;
+  const orderId = validation.dataId || queryDataId || bodyDataId;
 
   if (!validation.ok) {
-    // Em ambiente de TESTE, o próprio Mercado Pago orienta validar a compra
-    // consultando GET /v1/orders/{id} com o Access Token de teste.
-    // Este fallback é aceito SOMENTE para IDs ORDTST... .
-    // Orders reais de produção (ORD...) continuam exigindo assinatura válida.
-    if (/^ORDTST/i.test(candidateOrderId)) {
-      try {
-        const order = await fetchMercadoPagoOrder(candidateOrderId);
+    const accessToken = String(process.env.MP_ACCESS_TOKEN || "").trim();
+    const isTestEnvironment = accessToken.startsWith("TEST-");
 
+    // Fallback restrito ao ambiente de teste.
+    // Em produção, uma assinatura inválida sempre é rejeitada.
+    if (isTestEnvironment && /^ORDTST/i.test(orderId)) {
+      try {
+        const order = await fetchMercadoPagoOrder(orderId);
         const returnedId = String(order.id || "");
-        if (!returnedId || returnedId.toUpperCase() !== candidateOrderId.toUpperCase()) {
-          console.warn("Order de TESTE rejeitada: ID retornado não corresponde.", {
-            requestedId: candidateOrderId,
-            returnedId: returnedId || null
-          });
+
+        if (!returnedId || returnedId.toUpperCase() !== orderId.toUpperCase()) {
           return res.sendStatus(401);
         }
 
@@ -390,15 +358,12 @@ app.post("/api/webhooks/mercadopago", async (req, res) => {
         return res.sendStatus(200);
       } catch (error) {
         console.error("Falha ao confirmar Order de TESTE pela API:", {
-          orderId: candidateOrderId,
+          orderId,
           status: error.status || null,
           message: error.message
         });
 
-        if (!error.status || error.status >= 500) {
-          return res.sendStatus(503);
-        }
-
+        if (!error.status || error.status >= 500) return res.sendStatus(503);
         return res.sendStatus(401);
       }
     }
@@ -407,17 +372,15 @@ app.post("/api/webhooks/mercadopago", async (req, res) => {
     return res.sendStatus(validation.status);
   }
 
-  const orderId = candidateOrderId;
-
   console.log("Webhook Mercado Pago autenticado:", {
     notificationId: req.body?.id || null,
     action: req.body?.action || null,
     type: req.body?.type || null,
     liveMode: req.body?.live_mode ?? null,
-    dataId: orderId,
-    secretSource: validation.secretSource || null
+    dataId: orderId
   });
 
+  // Simulações de conectividade usam Data ID que não representa uma Order real.
   if (!/^ORD/i.test(orderId)) {
     console.log("Webhook de simulação validado com sucesso.");
     return res.sendStatus(200);
@@ -439,14 +402,10 @@ app.post("/api/webhooks/mercadopago", async (req, res) => {
     console.error("Falha ao consultar Order após Webhook:", {
       orderId,
       status: error.status || null,
-      message: error.message,
-      details: error.details || null
+      message: error.message
     });
 
-    if (!error.status || error.status >= 500) {
-      return res.sendStatus(503);
-    }
-
+    if (!error.status || error.status >= 500) return res.sendStatus(503);
     return res.sendStatus(200);
   }
 });

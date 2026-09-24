@@ -1,8 +1,8 @@
 {
   "name": "casamento-taiane-laudezir",
-  "version": "20.5.0",
+  "version": "21.0.0",
   "private": true,
-  "description": "Casamento Taiane e Laudezir — validação de Orders de teste pela API",
+  "description": "Casamento Taiane e Laudezir — integração Mercado Pago pronta para produção",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js"
