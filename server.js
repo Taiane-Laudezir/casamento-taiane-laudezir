@@ -156,7 +156,7 @@ app.get("/api/health", (req, res) => {
 
   res.json({
     ok: true,
-    version: "20.4.2-env-diag",
+    version: "20.5.0-test-order-verify",
     mercadoPagoConfigured: Boolean(token && token !== "SEU_ACCESS_TOKEN_AQUI"),
     webhookSecrets: {
       legacyConfigured: Boolean(webhookLegacy),
@@ -357,14 +357,57 @@ async function fetchMercadoPagoOrder(orderId) {
 // Não existe banco de dados nesta versão; o objetivo é validar a confirmação automática.
 app.post("/api/webhooks/mercadopago", async (req, res) => {
   const validation = validateMercadoPagoWebhook(req);
+  const queryDataId = String(req.query["data.id"] || "");
+  const bodyDataId = String(req.body?.data?.id || "");
+  const candidateOrderId = validation.dataId || queryDataId || bodyDataId;
 
   if (!validation.ok) {
+    // Em ambiente de TESTE, o próprio Mercado Pago orienta validar a compra
+    // consultando GET /v1/orders/{id} com o Access Token de teste.
+    // Este fallback é aceito SOMENTE para IDs ORDTST... .
+    // Orders reais de produção (ORD...) continuam exigindo assinatura válida.
+    if (/^ORDTST/i.test(candidateOrderId)) {
+      try {
+        const order = await fetchMercadoPagoOrder(candidateOrderId);
+
+        const returnedId = String(order.id || "");
+        if (!returnedId || returnedId.toUpperCase() !== candidateOrderId.toUpperCase()) {
+          console.warn("Order de TESTE rejeitada: ID retornado não corresponde.", {
+            requestedId: candidateOrderId,
+            returnedId: returnedId || null
+          });
+          return res.sendStatus(401);
+        }
+
+        console.log("Order de TESTE confirmada pela API:", {
+          id: returnedId,
+          status: order.status || null,
+          statusDetail: order.status_detail || null,
+          externalReference: order.external_reference || null,
+          totalAmount: order.total_amount || null
+        });
+
+        return res.sendStatus(200);
+      } catch (error) {
+        console.error("Falha ao confirmar Order de TESTE pela API:", {
+          orderId: candidateOrderId,
+          status: error.status || null,
+          message: error.message
+        });
+
+        if (!error.status || error.status >= 500) {
+          return res.sendStatus(503);
+        }
+
+        return res.sendStatus(401);
+      }
+    }
+
     console.warn("Webhook Mercado Pago rejeitado:", validation.reason);
     return res.sendStatus(validation.status);
   }
 
-  const bodyDataId = String(req.body?.data?.id || "");
-  const orderId = validation.dataId || bodyDataId;
+  const orderId = candidateOrderId;
 
   console.log("Webhook Mercado Pago autenticado:", {
     notificationId: req.body?.id || null,
@@ -375,8 +418,6 @@ app.post("/api/webhooks/mercadopago", async (req, res) => {
     secretSource: validation.secretSource || null
   });
 
-  // O simulador pode usar um Data ID fictício, como 123456.
-  // Nesse caso validamos a assinatura e respondemos 200 sem consultar uma Order inexistente.
   if (!/^ORD/i.test(orderId)) {
     console.log("Webhook de simulação validado com sucesso.");
     return res.sendStatus(200);
@@ -402,13 +443,10 @@ app.post("/api/webhooks/mercadopago", async (req, res) => {
       details: error.details || null
     });
 
-    // Para erros temporários, não confirmamos o recebimento.
-    // Assim o Mercado Pago poderá tentar entregar a notificação novamente.
     if (!error.status || error.status >= 500) {
       return res.sendStatus(503);
     }
 
-    // A assinatura era legítima; em erros definitivos 4xx evitamos retries infinitos.
     return res.sendStatus(200);
   }
 });
