@@ -1,51 +1,26 @@
-# Casamento T&L — Webhook via SDK oficial Mercado Pago
+# Casamento T&L — diagnóstico do Webhook TEST/PROD
 
-Esta versão substitui a validação HMAC manual pelo `WebhookSignatureValidator`
-do SDK oficial `mercadopago` (v3.6.1).
+Esta versão usa o SDK oficial do Mercado Pago e tenta validar a assinatura com:
 
-## Por que esta versão
+- `MP_WEBHOOK_SECRET_TEST`
+- `MP_WEBHOOK_SECRET_PROD`
+- `MP_WEBHOOK_SECRET` (compatibilidade)
 
-O simulador de Webhook retornava 200, mas notificações reais de Orders de teste
-eram rejeitadas como `Assinatura inválida`.
+Nenhuma chave é exposta nos logs. O servidor mostra somente a origem que validou:
+`TEST`, `PROD` ou `LEGACY`.
 
-A validação agora usa diretamente a implementação oficial do Mercado Pago:
+Após uma compra de teste, procure no Render:
 
-- `x-signature`
-- `x-request-id`
-- `data.id`
-- `MP_WEBHOOK_SECRET`
+`Webhook Mercado Pago autenticado`
 
-O SDK atual preserva corretamente o `data.id` de Orders no manifesto de assinatura.
+e veja:
 
-## Ambiente de teste
+`secretSource: 'TEST'`
 
-Enquanto `MP_ACCESS_TOKEN` for a credencial de teste:
+ou
 
-- mantenha a URL configurada em **Modo de teste**;
-- não é necessário preencher a URL de produção agora;
-- mantenha `Order (Mercado Pago)` marcado no Modo de teste;
-- `MP_WEBHOOK_SECRET` deve ser a assinatura secreta exibida no Modo de teste.
-
-## Render
-
-Mantenha estas variáveis:
-
-- `MP_ACCESS_TOKEN`
-- `MP_WEBHOOK_SECRET`
-
-Não exponha os valores em prints ou no GitHub.
-
-## Teste
-
-Após deploy:
-
-1. Simule `Order (Mercado Pago)` com Data ID `123456`.
-2. Confirme `200 - OK`.
-3. Faça uma compra real de teste com o comprador `Test`.
-4. Nos logs, o esperado é:
-   - `Webhook Mercado Pago autenticado`
-   - `Order Mercado Pago confirmada`
+`secretSource: 'PROD'`
 
 Commit sugerido:
 
-`Usa SDK oficial no webhook Mercado Pago`
+`Diagnostica webhook com chaves test e prod`

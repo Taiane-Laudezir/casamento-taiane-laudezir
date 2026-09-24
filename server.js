@@ -154,7 +154,7 @@ app.get("/api/health", (req, res) => {
 
   res.json({
     ok: true,
-    version: "20.4.0-webhook-sdk",
+    version: "20.4.1-webhook-dual-secret",
     mercadoPagoConfigured: Boolean(token && token !== "SEU_ACCESS_TOKEN_AQUI"),
     webhookConfigured: Boolean(webhookSecret)
   });
@@ -246,13 +246,18 @@ app.post("/api/checkout/order", async (req, res) => {
 });
 
 function validateMercadoPagoWebhook(req) {
-  const secret = String(process.env.MP_WEBHOOK_SECRET || "").trim();
   const xSignature = String(req.get("x-signature") || "");
   const xRequestId = String(req.get("x-request-id") || "");
   const queryDataId = String(req.query["data.id"] || "");
 
-  if (!secret) {
-    return { ok: false, status: 503, reason: "MP_WEBHOOK_SECRET não configurado." };
+  const candidates = [
+    { label: "TEST", secret: String(process.env.MP_WEBHOOK_SECRET_TEST || "").trim() },
+    { label: "PROD", secret: String(process.env.MP_WEBHOOK_SECRET_PROD || "").trim() },
+    { label: "LEGACY", secret: String(process.env.MP_WEBHOOK_SECRET || "").trim() }
+  ].filter(item => item.secret);
+
+  if (candidates.length === 0) {
+    return { ok: false, status: 503, reason: "Nenhuma chave de Webhook configurada." };
   }
 
   if (!xSignature || !xRequestId || !queryDataId) {
@@ -264,30 +269,45 @@ function validateMercadoPagoWebhook(req) {
     return { ok: false, status: 400, reason: "Cabeçalhos ou data.id ausentes." };
   }
 
-  try {
-    WebhookSignatureValidator.validate({
-      xSignature,
-      xRequestId,
-      dataId: queryDataId,
-      secret
-    });
+  let lastSignatureError = null;
 
-    return { ok: true, dataId: queryDataId };
-  } catch (error) {
-    if (error instanceof InvalidWebhookSignatureError) {
-      console.warn("Webhook Mercado Pago rejeitado pelo SDK oficial:", {
-        reason: error.message || "Assinatura inválida.",
-        dataId: queryDataId
+  for (const candidate of candidates) {
+    try {
+      WebhookSignatureValidator.validate({
+        xSignature,
+        xRequestId,
+        dataId: queryDataId,
+        secret: candidate.secret
       });
-      return { ok: false, status: 401, reason: "Assinatura inválida." };
-    }
 
-    console.error("Erro inesperado ao validar Webhook Mercado Pago:", {
-      name: error?.name || null,
-      message: error?.message || String(error)
-    });
-    return { ok: false, status: 500, reason: "Erro ao validar assinatura." };
+      return {
+        ok: true,
+        dataId: queryDataId,
+        secretSource: candidate.label
+      };
+    } catch (error) {
+      if (error instanceof InvalidWebhookSignatureError) {
+        lastSignatureError = error;
+        continue;
+      }
+
+      console.error("Erro inesperado ao validar Webhook Mercado Pago:", {
+        keyTried: candidate.label,
+        name: error?.name || null,
+        message: error?.message || String(error)
+      });
+
+      return { ok: false, status: 500, reason: "Erro ao validar assinatura." };
+    }
   }
+
+  console.warn("Webhook Mercado Pago rejeitado pelo SDK oficial:", {
+    reason: lastSignatureError?.message || "Assinatura inválida.",
+    dataId: queryDataId,
+    keysTried: candidates.map(item => item.label)
+  });
+
+  return { ok: false, status: 401, reason: "Assinatura inválida." };
 }
 
 async function fetchMercadoPagoOrder(orderId) {
@@ -342,7 +362,8 @@ app.post("/api/webhooks/mercadopago", async (req, res) => {
     action: req.body?.action || null,
     type: req.body?.type || null,
     liveMode: req.body?.live_mode ?? null,
-    dataId: orderId
+    dataId: orderId,
+    secretSource: validation.secretSource || null
   });
 
   // O simulador pode usar um Data ID fictício, como 123456.
