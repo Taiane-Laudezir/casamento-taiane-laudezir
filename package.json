@@ -1,8 +1,8 @@
 {
   "name": "casamento-taiane-laudezir",
-  "version": "20.4.1",
+  "version": "20.4.2",
   "private": true,
-  "description": "Casamento Taiane e Laudezir — diagnóstico Webhook TEST/PROD",
+  "description": "Casamento Taiane e Laudezir — diagnóstico seguro das variáveis Mercado Pago",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js"

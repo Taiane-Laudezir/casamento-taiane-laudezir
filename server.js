@@ -150,13 +150,22 @@ app.post("/api/pix", async (req, res) => {
 
 app.get("/api/health", (req, res) => {
   const token = String(process.env.MP_ACCESS_TOKEN || "").trim();
-  const webhookSecret = String(process.env.MP_WEBHOOK_SECRET || "").trim();
+  const webhookLegacy = String(process.env.MP_WEBHOOK_SECRET || "").trim();
+  const webhookTest = String(process.env.MP_WEBHOOK_SECRET_TEST || "").trim();
+  const webhookProd = String(process.env.MP_WEBHOOK_SECRET_PROD || "").trim();
 
   res.json({
     ok: true,
-    version: "20.4.1-webhook-dual-secret",
+    version: "20.4.2-env-diag",
     mercadoPagoConfigured: Boolean(token && token !== "SEU_ACCESS_TOKEN_AQUI"),
-    webhookConfigured: Boolean(webhookSecret)
+    webhookSecrets: {
+      legacyConfigured: Boolean(webhookLegacy),
+      testConfigured: Boolean(webhookTest),
+      prodConfigured: Boolean(webhookProd)
+    },
+    mpEnvironmentKeys: Object.keys(process.env)
+      .filter(key => key.startsWith("MP_"))
+      .sort()
   });
 });
 
