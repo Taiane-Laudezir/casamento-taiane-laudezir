@@ -150,7 +150,7 @@ app.get("/api/health", (req, res) => {
 
   res.json({
     ok: true,
-    version: "20.3.0-webhook",
+    version: "20.3.1-webhook-case-fix",
     mercadoPagoConfigured: Boolean(token && token !== "SEU_ACCESS_TOKEN_AQUI"),
     webhookConfigured: Boolean(webhookSecret)
   });
@@ -280,9 +280,9 @@ function validateMercadoPagoWebhook(req) {
     return { ok: false, status: 400, reason: "x-signature inválido." };
   }
 
-  // A documentação do Mercado Pago orienta usar data.id em minúsculas
-  // durante a validação da assinatura quando ele é alfanumérico.
-  const dataIdForSignature = queryDataId.toLowerCase();
+  // Para notificações de Order, o data.id deve manter exatamente a mesma
+  // capitalização recebida no query param. Alterar ORD... para ord... muda o HMAC.
+  const dataIdForSignature = queryDataId;
 
   const manifest =
     `id:${dataIdForSignature};` +

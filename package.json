@@ -1,8 +1,8 @@
 {
   "name": "casamento-taiane-laudezir",
-  "version": "20.3.0",
+  "version": "20.3.1",
   "private": true,
-  "description": "Casamento Taiane e Laudezir — Webhook seguro Mercado Pago",
+  "description": "Casamento Taiane e Laudezir — correção de assinatura Webhook Orders",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js"
