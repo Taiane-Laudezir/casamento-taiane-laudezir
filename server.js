@@ -145,11 +145,14 @@ app.post("/api/pix", async (req, res) => {
 });
 
 app.get("/api/health", (req, res) => {
-  const token = String(process.env.MP_ACCESS_TOKEN || "");
+  const token = String(process.env.MP_ACCESS_TOKEN || "").trim();
+  const webhookSecret = String(process.env.MP_WEBHOOK_SECRET || "").trim();
+
   res.json({
     ok: true,
-    version: "19.0.0-mp-test",
-    mercadoPagoConfigured: Boolean(token && token !== "SEU_ACCESS_TOKEN_AQUI")
+    version: "20.3.0-webhook",
+    mercadoPagoConfigured: Boolean(token && token !== "SEU_ACCESS_TOKEN_AQUI"),
+    webhookConfigured: Boolean(webhookSecret)
   });
 });
 
@@ -238,14 +241,157 @@ app.post("/api/checkout/order", async (req, res) => {
   }
 });
 
-// Endpoint reservado para a próxima etapa: confirmação automática por Webhook.
-// Nesta versão de TESTE ele apenas confirma o recebimento.
-app.post("/api/webhooks/mercadopago", (req, res) => {
-  console.log("Webhook Mercado Pago recebido:", {
-    query: req.query,
-    body: req.body
+function safeEqualHex(a, b) {
+  try {
+    const aBuffer = Buffer.from(String(a || ""), "hex");
+    const bBuffer = Buffer.from(String(b || ""), "hex");
+    if (aBuffer.length === 0 || aBuffer.length !== bBuffer.length) return false;
+    return crypto.timingSafeEqual(aBuffer, bBuffer);
+  } catch {
+    return false;
+  }
+}
+
+function validateMercadoPagoWebhook(req) {
+  const secret = String(process.env.MP_WEBHOOK_SECRET || "").trim();
+  const xSignature = String(req.get("x-signature") || "");
+  const xRequestId = String(req.get("x-request-id") || "");
+  const queryDataId = String(req.query["data.id"] || "");
+
+  if (!secret) {
+    return { ok: false, status: 503, reason: "MP_WEBHOOK_SECRET não configurado." };
+  }
+
+  if (!xSignature || !xRequestId || !queryDataId) {
+    return { ok: false, status: 400, reason: "Cabeçalhos ou data.id ausentes." };
+  }
+
+  let ts = "";
+  let receivedHash = "";
+
+  for (const part of xSignature.split(",")) {
+    const [key, ...rest] = part.split("=");
+    const value = rest.join("=").trim();
+    if (key?.trim() === "ts") ts = value;
+    if (key?.trim() === "v1") receivedHash = value;
+  }
+
+  if (!ts || !receivedHash) {
+    return { ok: false, status: 400, reason: "x-signature inválido." };
+  }
+
+  // A documentação do Mercado Pago orienta usar data.id em minúsculas
+  // durante a validação da assinatura quando ele é alfanumérico.
+  const dataIdForSignature = queryDataId.toLowerCase();
+
+  const manifest =
+    `id:${dataIdForSignature};` +
+    `request-id:${xRequestId};` +
+    `ts:${ts};`;
+
+  const expectedHash = crypto
+    .createHmac("sha256", secret)
+    .update(manifest)
+    .digest("hex");
+
+  if (!safeEqualHex(expectedHash, receivedHash)) {
+    return { ok: false, status: 401, reason: "Assinatura inválida." };
+  }
+
+  return { ok: true, dataId: queryDataId };
+}
+
+async function fetchMercadoPagoOrder(orderId) {
+  const accessToken = String(process.env.MP_ACCESS_TOKEN || "").trim();
+
+  if (!accessToken || accessToken === "SEU_ACCESS_TOKEN_AQUI") {
+    throw new Error("MP_ACCESS_TOKEN não configurado.");
+  }
+
+  const response = await fetch(
+    `https://api.mercadopago.com/v1/orders/${encodeURIComponent(orderId)}`,
+    {
+      headers: {
+        "Authorization": `Bearer ${accessToken}`,
+        "Content-Type": "application/json"
+      }
+    }
+  );
+
+  const result = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    const error = new Error(
+      result?.message || result?.error || `Mercado Pago respondeu HTTP ${response.status}`
+    );
+    error.status = response.status;
+    error.details = result;
+    throw error;
+  }
+
+  return result;
+}
+
+// Webhook seguro do Mercado Pago:
+// 1) valida x-signature com HMAC-SHA256;
+// 2) confirma a Order diretamente na API;
+// 3) registra apenas dados essenciais nos logs.
+// Não existe banco de dados nesta versão; o objetivo é validar a confirmação automática.
+app.post("/api/webhooks/mercadopago", async (req, res) => {
+  const validation = validateMercadoPagoWebhook(req);
+
+  if (!validation.ok) {
+    console.warn("Webhook Mercado Pago rejeitado:", validation.reason);
+    return res.sendStatus(validation.status);
+  }
+
+  const bodyDataId = String(req.body?.data?.id || "");
+  const orderId = validation.dataId || bodyDataId;
+
+  console.log("Webhook Mercado Pago autenticado:", {
+    notificationId: req.body?.id || null,
+    action: req.body?.action || null,
+    type: req.body?.type || null,
+    liveMode: req.body?.live_mode ?? null,
+    dataId: orderId
   });
-  res.sendStatus(200);
+
+  // O simulador pode usar um Data ID fictício, como 123456.
+  // Nesse caso validamos a assinatura e respondemos 200 sem consultar uma Order inexistente.
+  if (!/^ORD/i.test(orderId)) {
+    console.log("Webhook de simulação validado com sucesso.");
+    return res.sendStatus(200);
+  }
+
+  try {
+    const order = await fetchMercadoPagoOrder(orderId);
+
+    console.log("Order Mercado Pago confirmada:", {
+      id: order.id || orderId,
+      status: order.status || null,
+      statusDetail: order.status_detail || null,
+      externalReference: order.external_reference || null,
+      totalAmount: order.total_amount || null
+    });
+
+    return res.sendStatus(200);
+  } catch (error) {
+    console.error("Falha ao consultar Order após Webhook:", {
+      orderId,
+      status: error.status || null,
+      message: error.message,
+      details: error.details || null
+    });
+
+    // Para erros temporários, não confirmamos o recebimento.
+    // Assim o Mercado Pago poderá tentar entregar a notificação novamente.
+    if (!error.status || error.status >= 500) {
+      return res.sendStatus(503);
+    }
+
+    // A assinatura era legítima; em erros definitivos 4xx evitamos retries infinitos.
+    return res.sendStatus(200);
+  }
 });
 
 app.listen(PORT, () => {
