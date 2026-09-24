@@ -3,6 +3,10 @@ const express = require("express");
 const path = require("path");
 const crypto = require("crypto");
 const QRCode = require("qrcode");
+const {
+  WebhookSignatureValidator,
+  InvalidWebhookSignatureError
+} = require("mercadopago");
 
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
@@ -150,7 +154,7 @@ app.get("/api/health", (req, res) => {
 
   res.json({
     ok: true,
-    version: "20.3.1-webhook-case-fix",
+    version: "20.4.0-webhook-sdk",
     mercadoPagoConfigured: Boolean(token && token !== "SEU_ACCESS_TOKEN_AQUI"),
     webhookConfigured: Boolean(webhookSecret)
   });
@@ -241,17 +245,6 @@ app.post("/api/checkout/order", async (req, res) => {
   }
 });
 
-function safeEqualHex(a, b) {
-  try {
-    const aBuffer = Buffer.from(String(a || ""), "hex");
-    const bBuffer = Buffer.from(String(b || ""), "hex");
-    if (aBuffer.length === 0 || aBuffer.length !== bBuffer.length) return false;
-    return crypto.timingSafeEqual(aBuffer, bBuffer);
-  } catch {
-    return false;
-  }
-}
-
 function validateMercadoPagoWebhook(req) {
   const secret = String(process.env.MP_WEBHOOK_SECRET || "").trim();
   const xSignature = String(req.get("x-signature") || "");
@@ -263,42 +256,38 @@ function validateMercadoPagoWebhook(req) {
   }
 
   if (!xSignature || !xRequestId || !queryDataId) {
+    console.warn("Webhook Mercado Pago sem campos necessários:", {
+      hasSignature: Boolean(xSignature),
+      hasRequestId: Boolean(xRequestId),
+      hasDataId: Boolean(queryDataId)
+    });
     return { ok: false, status: 400, reason: "Cabeçalhos ou data.id ausentes." };
   }
 
-  let ts = "";
-  let receivedHash = "";
+  try {
+    WebhookSignatureValidator.validate({
+      xSignature,
+      xRequestId,
+      dataId: queryDataId,
+      secret
+    });
 
-  for (const part of xSignature.split(",")) {
-    const [key, ...rest] = part.split("=");
-    const value = rest.join("=").trim();
-    if (key?.trim() === "ts") ts = value;
-    if (key?.trim() === "v1") receivedHash = value;
+    return { ok: true, dataId: queryDataId };
+  } catch (error) {
+    if (error instanceof InvalidWebhookSignatureError) {
+      console.warn("Webhook Mercado Pago rejeitado pelo SDK oficial:", {
+        reason: error.message || "Assinatura inválida.",
+        dataId: queryDataId
+      });
+      return { ok: false, status: 401, reason: "Assinatura inválida." };
+    }
+
+    console.error("Erro inesperado ao validar Webhook Mercado Pago:", {
+      name: error?.name || null,
+      message: error?.message || String(error)
+    });
+    return { ok: false, status: 500, reason: "Erro ao validar assinatura." };
   }
-
-  if (!ts || !receivedHash) {
-    return { ok: false, status: 400, reason: "x-signature inválido." };
-  }
-
-  // Para notificações de Order, o data.id deve manter exatamente a mesma
-  // capitalização recebida no query param. Alterar ORD... para ord... muda o HMAC.
-  const dataIdForSignature = queryDataId;
-
-  const manifest =
-    `id:${dataIdForSignature};` +
-    `request-id:${xRequestId};` +
-    `ts:${ts};`;
-
-  const expectedHash = crypto
-    .createHmac("sha256", secret)
-    .update(manifest)
-    .digest("hex");
-
-  if (!safeEqualHex(expectedHash, receivedHash)) {
-    return { ok: false, status: 401, reason: "Assinatura inválida." };
-  }
-
-  return { ok: true, dataId: queryDataId };
 }
 
 async function fetchMercadoPagoOrder(orderId) {
