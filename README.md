@@ -1,36 +1,23 @@
-# Casamento T&L — versão limpa para produção
+# Casamento T&L — compatibilidade de assinatura Webhook Orders
 
-Esta versão remove diagnósticos temporários de Webhook e textos de ambiente de teste.
+Esta versão mantém a configuração limpa de produção e altera somente a validação
+da assinatura do Webhook.
 
-## Variáveis esperadas no Render
+Para `data.id` alfanumérico, o servidor tenta validar com:
+1. o ID exatamente como recebido;
+2. se necessário, o mesmo ID em minúsculas.
 
-Somente estas duas são usadas pelo código:
+Nos dois casos a validação continua criptográfica com `MP_WEBHOOK_SECRET`
+usando o SDK oficial do Mercado Pago. Não existe bypass de assinatura.
 
+O log mostrará apenas:
+- `signatureDataIdMode: 'original'`
+ou
+- `signatureDataIdMode: 'lowercase'`
+
+Variáveis esperadas:
 - `MP_ACCESS_TOKEN`
 - `MP_WEBHOOK_SECRET`
 
-Durante a etapa de teste, `MP_ACCESS_TOKEN` pode continuar sendo o token TEST.
-Ao entrar em produção, substitua por Access Token de produção e use a assinatura
-secreta cadastrada em Webhooks > Modo de produção.
-
-## Webhook
-
-- Validação principal: SDK oficial do Mercado Pago.
-- Notificação válida: consulta a Order em `/v1/orders/{id}` para confirmar estado.
-- Fallback para assinatura inválida: existe somente quando o Access Token começa
-  por `TEST-` e o ID começa por `ORDTST`.
-- Em produção, assinatura inválida é sempre rejeitada.
-
-## Endpoint de saúde
-
-`/api/health` informa apenas se Mercado Pago e Webhook estão configurados.
-Não lista nomes de variáveis nem expõe valores.
-
-## Textos do site
-
-Foram removidas mensagens de "ambiente de teste" e a mensagem temporária sobre
-ativar Webhook futuramente.
-
 Commit sugerido:
-
-`Limpa integracao Mercado Pago para producao`
+`Compatibiliza assinatura webhook Orders`

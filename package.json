@@ -1,8 +1,8 @@
 {
   "name": "casamento-taiane-laudezir",
-  "version": "21.0.0",
+  "version": "21.0.1",
   "private": true,
-  "description": "Casamento Taiane e Laudezir — integração Mercado Pago pronta para produção",
+  "description": "Casamento Taiane e Laudezir — compatibilidade de assinatura Webhook Orders",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js"

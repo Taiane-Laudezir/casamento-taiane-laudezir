@@ -154,7 +154,7 @@ app.get("/api/health", (req, res) => {
 
   res.json({
     ok: true,
-    version: "21.0.0-production-ready",
+    version: "21.0.1-webhook-case-compat",
     mercadoPagoConfigured: Boolean(token && token !== "SEU_ACCESS_TOKEN_AQUI"),
     webhookConfigured: Boolean(webhookSecret)
   });
@@ -264,30 +264,50 @@ function validateMercadoPagoWebhook(req) {
     return { ok: false, status: 400, reason: "Cabeçalhos ou data.id ausentes." };
   }
 
-  try {
-    WebhookSignatureValidator.validate({
-      xSignature,
-      xRequestId,
-      dataId: queryDataId,
-      secret
-    });
+  const candidates = [{ mode: "original", dataId: queryDataId }];
+  const lowerDataId = queryDataId.toLowerCase();
 
-    return { ok: true, dataId: queryDataId };
-  } catch (error) {
-    if (error instanceof InvalidWebhookSignatureError) {
-      console.warn("Webhook Mercado Pago rejeitado:", {
-        reason: error.message || "Assinatura inválida.",
-        dataId: queryDataId
-      });
-      return { ok: false, status: 401, reason: "Assinatura inválida." };
-    }
-
-    console.error("Erro inesperado ao validar Webhook Mercado Pago:", {
-      name: error?.name || null,
-      message: error?.message || String(error)
-    });
-    return { ok: false, status: 500, reason: "Erro ao validar assinatura." };
+  if (lowerDataId !== queryDataId) {
+    candidates.push({ mode: "lowercase", dataId: lowerDataId });
   }
+
+  let lastSignatureError = null;
+
+  for (const candidate of candidates) {
+    try {
+      WebhookSignatureValidator.validate({
+        xSignature,
+        xRequestId,
+        dataId: candidate.dataId,
+        secret
+      });
+
+      return {
+        ok: true,
+        dataId: queryDataId,
+        signatureDataIdMode: candidate.mode
+      };
+    } catch (error) {
+      if (error instanceof InvalidWebhookSignatureError) {
+        lastSignatureError = error;
+        continue;
+      }
+
+      console.error("Erro inesperado ao validar Webhook Mercado Pago:", {
+        name: error?.name || null,
+        message: error?.message || String(error)
+      });
+      return { ok: false, status: 500, reason: "Erro ao validar assinatura." };
+    }
+  }
+
+  console.warn("Webhook Mercado Pago rejeitado:", {
+    reason: lastSignatureError?.message || "Assinatura inválida.",
+    dataId: queryDataId,
+    dataIdModesTried: candidates.map(item => item.mode)
+  });
+
+  return { ok: false, status: 401, reason: "Assinatura inválida." };
 }
 
 async function fetchMercadoPagoOrder(orderId) {
@@ -377,7 +397,8 @@ app.post("/api/webhooks/mercadopago", async (req, res) => {
     action: req.body?.action || null,
     type: req.body?.type || null,
     liveMode: req.body?.live_mode ?? null,
-    dataId: orderId
+    dataId: orderId,
+    signatureDataIdMode: validation.signatureDataIdMode || "original"
   });
 
   // Simulações de conectividade usam Data ID que não representa uma Order real.
