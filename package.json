@@ -1,8 +1,8 @@
 {
   "name": "casamento-taiane-laudezir",
-  "version": "21.0.1",
+  "version": "22.0.0",
   "private": true,
-  "description": "Casamento Taiane e Laudezir — compatibilidade de assinatura Webhook Orders",
+  "description": "Casamento Taiane e Laudezir — mensagens dos convidados por e-mail + pagamentos estáveis",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js"

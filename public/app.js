@@ -21,6 +21,8 @@ const gifts = [
 ];
 
 let selectedGift = null;
+let guestData = null;
+let currentPixMessageToken = null;
 
 const grid = document.getElementById("giftGrid");
 const modal = document.getElementById("paymentModal");
@@ -28,6 +30,9 @@ const nameEl = document.getElementById("selectedGiftName");
 const valueEl = document.getElementById("selectedGiftValue");
 const container = document.getElementById("paymentBrick_container");
 const money = value => Number(value).toLocaleString("pt-BR", {style:"currency",currency:"BRL"});
+const escapeHTML = value => String(value ?? "").replace(/[&<>"']/g, char => ({
+  "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#039;"
+}[char]));
 
 gifts.forEach((g, i) => {
   const card = document.createElement("article");
@@ -120,11 +125,13 @@ modal.addEventListener("click", e => {
 
 function openPayment(gift) {
   selectedGift = gift;
+  guestData = null;
+  currentPixMessageToken = null;
   nameEl.textContent = gift.name;
   valueEl.textContent = money(gift.value);
   modal.classList.remove("hidden");
   document.body.style.overflow = "hidden";
-  renderCheckoutPro();
+  renderGuestStep();
 }
 
 function closePayment() {
@@ -132,8 +139,61 @@ function closePayment() {
   document.body.style.overflow = "";
 }
 
-function renderCheckoutPro() {
+function renderGuestStep() {
+  const previous = guestData || { name: "", email: "", message: "" };
   container.innerHTML = `
+    <form class="guest-message-form" id="guestMessageForm" novalidate>
+      <div class="guest-message-heading">
+        <strong>Uma mensagem para os noivos</strong>
+        <p>Antes de escolher a forma de pagamento, deixe seu carinho para Taiane e Laudezir.</p>
+      </div>
+
+      <label class="guest-field">
+        <span>Seu nome</span>
+        <input type="text" id="guestName" maxlength="80" autocomplete="name" required value="${escapeHTML(previous.name)}">
+      </label>
+
+      <label class="guest-field">
+        <span>Seu e-mail</span>
+        <input type="email" id="guestEmail" maxlength="160" autocomplete="email" required value="${escapeHTML(previous.email)}">
+      </label>
+
+      <label class="guest-field">
+        <span>Deixe uma mensagem para Taiane e Laudezir</span>
+        <textarea id="guestMessage" maxlength="1200" rows="5" required>${escapeHTML(previous.message)}</textarea>
+      </label>
+
+      <button type="submit" class="btn guest-continue-btn">Continuar para o pagamento</button>
+      <small class="guest-privacy">Seu e-mail será usado somente para identificar sua mensagem e permitir que os noivos respondam a você.</small>
+    </form>`;
+
+  document.getElementById("guestMessageForm").addEventListener("submit", event => {
+    event.preventDefault();
+    const name = document.getElementById("guestName").value.trim().replace(/\s+/g, " ");
+    const email = document.getElementById("guestEmail").value.trim().toLowerCase();
+    const message = document.getElementById("guestMessage").value.trim();
+
+    if (name.length < 2) return alert("Informe seu nome.");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return alert("Informe um e-mail válido.");
+    if (message.length < 2) return alert("Escreva uma mensagem para Taiane e Laudezir.");
+
+    guestData = { name, email, message };
+    renderCheckoutPro();
+  });
+}
+
+function renderCheckoutPro() {
+  if (!guestData) return renderGuestStep();
+
+  container.innerHTML = `
+    <div class="guest-message-summary">
+      <div>
+        <span>Mensagem de</span>
+        <strong>${escapeHTML(guestData.name)}</strong>
+      </div>
+      <button type="button" class="guest-edit-btn" id="editGuestBtn">Alterar</button>
+    </div>
+
     <div class="payment-choice">
       <div class="payment-choice-tabs" role="tablist" aria-label="Forma de pagamento">
         <button type="button" class="payment-choice-tab active" id="pixTab" role="tab" aria-selected="true">PIX</button>
@@ -149,7 +209,7 @@ function renderCheckoutPro() {
           <strong>Pagar com cartão de crédito</strong>
           <p>Você será direcionado ao ambiente seguro do Mercado Pago para preencher os dados do cartão.</p>
           <button class="btn checkout-pro-btn" id="startCheckoutBtn">Pagar com cartão</button>
-          <small>Pagamento seguro processado pelo Mercado Pago.</small>
+          <small>Sua mensagem será enviada aos noivos após a confirmação do pagamento.</small>
         </div>
       </div>
     </div>`;
@@ -169,6 +229,7 @@ function renderCheckoutPro() {
     cardTab.setAttribute("aria-selected", String(!pixActive));
   }
 
+  document.getElementById("editGuestBtn").addEventListener("click", renderGuestStep);
   pixTab.addEventListener("click", () => activate("pix"));
   cardTab.addEventListener("click", () => activate("card"));
   document.getElementById("startCheckoutBtn").addEventListener("click", startCheckout);
@@ -186,12 +247,14 @@ async function loadPix() {
       headers: {"Content-Type":"application/json"},
       body: JSON.stringify({
         giftId: selectedGift.id,
-        customAmount: selectedGift.id === "custom" ? selectedGift.value : undefined
+        customAmount: selectedGift.id === "custom" ? selectedGift.value : undefined,
+        guest: guestData
       })
     });
 
     const result = await response.json();
     if (!response.ok) throw new Error(result.message || "Não foi possível gerar o Pix.");
+    currentPixMessageToken = result.messageToken || null;
 
     panel.innerHTML = `
       <div class="pix-box">
@@ -213,6 +276,12 @@ async function loadPix() {
         </div>
 
         <small>O valor já está preenchido conforme o presente escolhido.</small>
+
+        <div class="pix-message-box">
+          <p>Depois de concluir o Pix no aplicativo do banco, toque abaixo para enviar sua mensagem aos noivos.</p>
+          <button type="button" class="btn pix-message-btn" id="sendPixMessageBtn">Já fiz o Pix — enviar minha mensagem</button>
+          <span class="pix-message-status" id="pixMessageStatus" aria-live="polite"></span>
+        </div>
       </div>`;
 
     panel.querySelectorAll("[data-copy-target]").forEach(button => {
@@ -231,9 +300,40 @@ async function loadPix() {
         setTimeout(() => button.textContent = old, 1600);
       });
     });
+
+    document.getElementById("sendPixMessageBtn")?.addEventListener("click", sendPixMessage);
   } catch (error) {
     console.error(error);
     panel.innerHTML = `<div class="pix-error">${error.message}</div>`;
+  }
+}
+
+async function sendPixMessage() {
+  const button = document.getElementById("sendPixMessageBtn");
+  const status = document.getElementById("pixMessageStatus");
+  if (!button || !currentPixMessageToken) return;
+
+  button.disabled = true;
+  const originalText = button.textContent;
+  button.textContent = "Enviando mensagem...";
+  if (status) status.textContent = "";
+
+  try {
+    const response = await fetch("/api/gift-message/pix", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({ messageToken: currentPixMessageToken })
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.message || "Não foi possível enviar a mensagem.");
+
+    button.textContent = "Mensagem enviada 💚";
+    if (status) status.textContent = "Taiane e Laudezir receberão sua mensagem por e-mail.";
+  } catch (error) {
+    console.error(error);
+    button.disabled = false;
+    button.textContent = originalText;
+    if (status) status.textContent = error.message;
   }
 }
 
@@ -251,7 +351,8 @@ async function startCheckout() {
       headers: {"Content-Type":"application/json"},
       body: JSON.stringify({
         giftId: selectedGift.id,
-        customAmount: selectedGift.id === "custom" ? selectedGift.value : undefined
+        customAmount: selectedGift.id === "custom" ? selectedGift.value : undefined,
+        guest: guestData
       })
     });
 
@@ -262,8 +363,18 @@ async function startCheckout() {
       throw new Error((result.message || "Não foi possível iniciar o pagamento.") + extra);
     }
 
-    if (!result.checkoutUrl) {
-      throw new Error("O Mercado Pago não retornou o link do checkout.");
+    if (!result.checkoutUrl || !result.orderId || !result.messageToken) {
+      throw new Error("O Mercado Pago não retornou todos os dados necessários do checkout.");
+    }
+
+    try {
+      localStorage.setItem("tl_pending_card_message", JSON.stringify({
+        orderId: result.orderId,
+        messageToken: result.messageToken,
+        createdAt: Date.now()
+      }));
+    } catch (storageError) {
+      console.warn("Não foi possível guardar a mensagem para o retorno do checkout:", storageError);
     }
 
     window.location.href = result.checkoutUrl;
@@ -275,6 +386,51 @@ async function startCheckout() {
   }
 }
 
+async function confirmPendingCardMessage(statusElement) {
+  let pending = null;
+  try {
+    pending = JSON.parse(localStorage.getItem("tl_pending_card_message") || "null");
+  } catch (_) {}
+
+  if (!pending?.orderId || !pending?.messageToken) return;
+  if (Date.now() - Number(pending.createdAt || 0) > 1000 * 60 * 60 * 24 * 7) {
+    localStorage.removeItem("tl_pending_card_message");
+    return;
+  }
+
+  const waits = [0, 1800, 3500];
+  let lastError = null;
+
+  for (const wait of waits) {
+    if (wait) await new Promise(resolve => setTimeout(resolve, wait));
+    try {
+      const response = await fetch("/api/gift-message/card", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({ orderId: pending.orderId, messageToken: pending.messageToken })
+      });
+      const result = await response.json().catch(() => ({}));
+
+      if (response.ok) {
+        localStorage.removeItem("tl_pending_card_message");
+        if (statusElement) statusElement.textContent = "Pagamento confirmado e sua mensagem foi enviada aos noivos. 💚";
+        return;
+      }
+
+      lastError = new Error(result.message || "Não foi possível enviar a mensagem.");
+      if (response.status !== 409) break;
+    } catch (error) {
+      lastError = error;
+      break;
+    }
+  }
+
+  console.error(lastError);
+  if (statusElement) {
+    statusElement.textContent = "Pagamento concluído. A mensagem ainda não pôde ser enviada por e-mail; tente recarregar a página em instantes.";
+  }
+}
+
 function showPaymentReturnMessage() {
   const params = new URLSearchParams(window.location.search);
   const result = params.get("payment_result");
@@ -283,7 +439,7 @@ function showPaymentReturnMessage() {
   const messages = {
     success: {
       title: "Obrigado pelo presente!",
-      text: "O Mercado Pago informou que o pagamento foi concluído. Obrigado pelo presente!"
+      text: "Pagamento concluído. Estamos enviando sua mensagem aos noivos..."
     },
     pending: {
       title: "Pagamento pendente",
@@ -303,6 +459,9 @@ function showPaymentReturnMessage() {
     <strong>${message.title}</strong>
     <span>${message.text}</span>`;
   document.body.appendChild(toast);
+
+  const statusText = toast.querySelector("span");
+  if (result === "success") confirmPendingCardMessage(statusText);
 
   toast.querySelector("button").addEventListener("click", () => toast.remove());
 
