@@ -295,7 +295,7 @@ app.get("/api/health", (req, res) => {
 
   res.json({
     ok: true,
-    version: "22.0.0-gift-messages",
+    version: "22.0.1-gift-message-retry",
     mercadoPagoConfigured: Boolean(token && token !== "SEU_ACCESS_TOKEN_AQUI"),
     webhookConfigured: Boolean(webhookSecret),
     giftEmailConfigured: Boolean(String(process.env.RESEND_API_KEY || "").trim() && String(process.env.GIFT_EMAIL_TO || "").trim())
@@ -455,13 +455,18 @@ app.post("/api/gift-message/card", async (req, res) => {
       });
     }
 
-    await sendGiftMessageEmail({
+    const emailResult = await sendGiftMessageEmail({
       guest: data.guest,
       giftName: data.giftName,
       amount: data.amount,
       paymentMethod: "Cartão de crédito — Mercado Pago",
       paymentStatus: "pagamento confirmado",
-      idempotencyKey: `gift-card/${orderId}`
+      idempotencyKey: `gift-card-v2/${orderId}`
+    });
+
+    console.log("Mensagem do cartão enviada por e-mail:", {
+      orderId,
+      emailId: emailResult?.id || null
     });
 
     return res.json({ ok: true, message: "Mensagem enviada aos noivos." });

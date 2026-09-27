@@ -392,10 +392,14 @@ async function confirmPendingCardMessage(statusElement) {
     pending = JSON.parse(localStorage.getItem("tl_pending_card_message") || "null");
   } catch (_) {}
 
-  if (!pending?.orderId || !pending?.messageToken) return;
+  if (!pending?.orderId || !pending?.messageToken) {
+    if (statusElement) statusElement.textContent = "Pagamento concluído.";
+    return true;
+  }
   if (Date.now() - Number(pending.createdAt || 0) > 1000 * 60 * 60 * 24 * 7) {
     localStorage.removeItem("tl_pending_card_message");
-    return;
+    if (statusElement) statusElement.textContent = "Pagamento concluído.";
+    return true;
   }
 
   const waits = [0, 1800, 3500];
@@ -414,7 +418,7 @@ async function confirmPendingCardMessage(statusElement) {
       if (response.ok) {
         localStorage.removeItem("tl_pending_card_message");
         if (statusElement) statusElement.textContent = "Pagamento confirmado e sua mensagem foi enviada aos noivos. 💚";
-        return;
+        return true;
       }
 
       lastError = new Error(result.message || "Não foi possível enviar a mensagem.");
@@ -427,8 +431,9 @@ async function confirmPendingCardMessage(statusElement) {
 
   console.error(lastError);
   if (statusElement) {
-    statusElement.textContent = "Pagamento concluído. A mensagem ainda não pôde ser enviada por e-mail; tente recarregar a página em instantes.";
+    statusElement.textContent = "Pagamento concluído. A mensagem ainda não pôde ser enviada por e-mail; recarregue esta página para tentar novamente.";
   }
+  return false;
 }
 
 function showPaymentReturnMessage() {
@@ -461,18 +466,29 @@ function showPaymentReturnMessage() {
   document.body.appendChild(toast);
 
   const statusText = toast.querySelector("span");
-  if (result === "success") confirmPendingCardMessage(statusText);
+
+  const clearPaymentResult = () => {
+    const cleanParams = new URLSearchParams(window.location.search);
+    cleanParams.delete("payment_result");
+    const query = cleanParams.toString();
+    history.replaceState(null, "", `${location.pathname}${query ? `?${query}` : ""}`);
+  };
+
+  if (result === "success") {
+    // Só limpa o marcador quando a mensagem foi enviada (ou não há dados pendentes).
+    // Se o envio falhar, mantemos ?payment_result=success para que F5 tente novamente.
+    confirmPendingCardMessage(statusText).then(sent => {
+      if (sent) clearPaymentResult();
+    });
+  } else {
+    clearPaymentResult();
+  }
 
   toast.querySelector("button").addEventListener("click", () => toast.remove());
 
   setTimeout(() => {
     document.getElementById("presentes")?.scrollIntoView({behavior:"smooth", block:"start"});
   }, 250);
-
-  // Remove o marcador da URL sem recarregar a página.
-  params.delete("payment_result");
-  const query = params.toString();
-  history.replaceState(null, "", `${location.pathname}${query ? `?${query}` : ""}`);
 }
 
 window.addEventListener("load", showPaymentReturnMessage);

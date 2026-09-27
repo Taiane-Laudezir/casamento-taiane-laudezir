@@ -1,4 +1,4 @@
-# Casamento T&L — v22.0.0 — mensagens por e-mail
+# Casamento T&L — v22.0.1 — mensagens por e-mail
 
 Esta versão parte da **v21.0.1 estável** e preserva a integração de produção do Mercado Pago, incluindo a compatibilidade de assinatura do Webhook Orders (`original` / `lowercase`).
 
@@ -48,3 +48,9 @@ Depois de configurar, `/api/health` deve mostrar:
 ## Observação importante
 
 A lógica já validada do Mercado Pago/Webhook não foi removida nem substituída. A funcionalidade de mensagem foi adicionada ao redor do fluxo existente.
+
+
+## Correção v22.0.1
+- Novo namespace de idempotência para o e-mail do cartão (`gift-card-v2/...`), evitando conflito com a tentativa anterior feita com outro destinatário.
+- Em retorno de cartão aprovado, `?payment_result=success` só é removido após o e-mail ser enviado; se houver falha, F5 tenta novamente sem nova cobrança.
+- Log de sucesso do envio inclui somente o ID da Order e o ID do e-mail do Resend.
