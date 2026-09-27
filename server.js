@@ -295,7 +295,7 @@ app.get("/api/health", (req, res) => {
 
   res.json({
     ok: true,
-    version: "22.0.1-gift-message-retry",
+    version: "22.0.2-gift-message-order-search",
     mercadoPagoConfigured: Boolean(token && token !== "SEU_ACCESS_TOKEN_AQUI"),
     webhookConfigured: Boolean(webhookSecret),
     giftEmailConfigured: Boolean(String(process.env.RESEND_API_KEY || "").trim() && String(process.env.GIFT_EMAIL_TO || "").trim())
@@ -437,7 +437,22 @@ app.post("/api/gift-message/card", async (req, res) => {
       return res.status(400).json({ message: "Mensagem do cartão inválida." });
     }
 
-    const order = await fetchMercadoPagoOrder(orderId);
+    let order;
+    try {
+      order = await fetchMercadoPagoOrder(orderId);
+    } catch (error) {
+      // Em um retry tardio, o GET direto por ID pode responder 404.
+      // A Orders API também permite localizar a order pela external_reference.
+      if (error.status !== 404) throw error;
+      order = await searchMercadoPagoOrderByReference(
+        String(data.externalReference || ""),
+        Number(data.createdAt || 0)
+      );
+      console.log("Order recuperada por external_reference para retry:", {
+        orderId: order?.id || null,
+        externalReference: order?.external_reference || null
+      });
+    }
     const returnedId = String(order.id || "");
     const status = String(order.status || "").toLowerCase();
     const statusDetail = String(order.status_detail || "").toLowerCase();
@@ -540,6 +555,61 @@ function validateMercadoPagoWebhook(req) {
   });
 
   return { ok: false, status: 401, reason: "Assinatura inválida." };
+}
+
+async function searchMercadoPagoOrderByReference(externalReference, createdAt) {
+  const accessToken = String(process.env.MP_ACCESS_TOKEN || "").trim();
+
+  if (!accessToken || accessToken === "SEU_ACCESS_TOKEN_AQUI") {
+    throw new Error("MP_ACCESS_TOKEN não configurado.");
+  }
+
+  if (!externalReference) {
+    const error = new Error("Referência externa do pagamento ausente.");
+    error.status = 400;
+    throw error;
+  }
+
+  const baseTime = Number.isFinite(createdAt) && createdAt > 0 ? createdAt : Date.now();
+  const beginDate = new Date(baseTime - 6 * 60 * 60 * 1000).toISOString();
+  const endDate = new Date(baseTime + 48 * 60 * 60 * 1000).toISOString();
+
+  const params = new URLSearchParams({
+    begin_date: beginDate,
+    end_date: endDate,
+    external_reference: externalReference,
+    status: "processed",
+    limit: "10"
+  });
+
+  const response = await fetch(`https://api.mercadopago.com/v1/orders?${params.toString()}`, {
+    headers: {
+      "Authorization": `Bearer ${accessToken}`,
+      "Content-Type": "application/json"
+    }
+  });
+
+  const result = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    const error = new Error(
+      result?.message || result?.error || `Mercado Pago respondeu HTTP ${response.status}`
+    );
+    error.status = response.status;
+    error.details = result;
+    throw error;
+  }
+
+  const orders = Array.isArray(result?.data) ? result.data : [];
+  const order = orders.find(item => String(item?.external_reference || "") === externalReference);
+
+  if (!order) {
+    const error = new Error("Não foi possível localizar a order pelo identificador do pagamento.");
+    error.status = 404;
+    throw error;
+  }
+
+  return order;
 }
 
 async function fetchMercadoPagoOrder(orderId) {
