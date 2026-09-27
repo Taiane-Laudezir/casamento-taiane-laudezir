@@ -295,7 +295,7 @@ app.get("/api/health", (req, res) => {
 
   res.json({
     ok: true,
-    version: "22.0.2-gift-message-order-search",
+    version: "22.0.3-gift-message-order-retry",
     mercadoPagoConfigured: Boolean(token && token !== "SEU_ACCESS_TOKEN_AQUI"),
     webhookConfigured: Boolean(webhookSecret),
     giftEmailConfigured: Boolean(String(process.env.RESEND_API_KEY || "").trim() && String(process.env.GIFT_EMAIL_TO || "").trim())
@@ -438,18 +438,21 @@ app.post("/api/gift-message/card", async (req, res) => {
     }
 
     let order;
+    let recoveredByReference = false;
     try {
       order = await fetchMercadoPagoOrder(orderId);
     } catch (error) {
       // Em um retry tardio, o GET direto por ID pode responder 404.
-      // A Orders API também permite localizar a order pela external_reference.
+      // Nessa situação procuramos a Order pela external_reference assinada no messageToken.
       if (error.status !== 404) throw error;
       order = await searchMercadoPagoOrderByReference(
         String(data.externalReference || ""),
         Number(data.createdAt || 0)
       );
+      recoveredByReference = true;
       console.log("Order recuperada por external_reference para retry:", {
-        orderId: order?.id || null,
+        requestedOrderId: orderId,
+        returnedOrderId: order?.id || null,
         externalReference: order?.external_reference || null
       });
     }
@@ -463,8 +466,12 @@ app.post("/api/gift-message/card", async (req, res) => {
     const sameOrder = returnedId.toUpperCase() === orderId.toUpperCase();
     const sameReference = externalReference === String(data.externalReference || "");
     const sameAmount = Number.isFinite(totalAmount) && Math.abs(totalAmount - Number(data.amount)) < 0.01;
+    // Quando a própria API não encontra o ID originalmente criado, aceitamos a Order
+    // recuperada pela external_reference assinada, desde que referência, valor e status
+    // de pagamento coincidam exatamente.
+    const orderIdentityOk = sameOrder || (recoveredByReference && sameReference);
 
-    if (!paid || !sameOrder || !sameReference || !sameAmount) {
+    if (!paid || !orderIdentityOk || !sameReference || !sameAmount) {
       return res.status(409).json({
         message: paid ? "Não foi possível relacionar a mensagem ao pagamento." : "O pagamento ainda não está confirmado."
       });
@@ -571,45 +578,75 @@ async function searchMercadoPagoOrderByReference(externalReference, createdAt) {
   }
 
   const baseTime = Number.isFinite(createdAt) && createdAt > 0 ? createdAt : Date.now();
-  const beginDate = new Date(baseTime - 6 * 60 * 60 * 1000).toISOString();
-  const endDate = new Date(baseTime + 48 * 60 * 60 * 1000).toISOString();
+  // Janela propositalmente ampla para retries dias depois do pagamento.
+  const beginDate = new Date(baseTime - 24 * 60 * 60 * 1000).toISOString();
+  const endDate = new Date(Math.max(Date.now() + 24 * 60 * 60 * 1000, baseTime + 7 * 24 * 60 * 60 * 1000)).toISOString();
 
-  const params = new URLSearchParams({
-    begin_date: beginDate,
-    end_date: endDate,
-    external_reference: externalReference,
-    status: "processed",
-    limit: "10"
-  });
+  async function queryOrders(extraParams) {
+    const params = new URLSearchParams({
+      begin_date: beginDate,
+      end_date: endDate,
+      type: "online",
+      ...extraParams
+    });
 
-  const response = await fetch(`https://api.mercadopago.com/v1/orders?${params.toString()}`, {
-    headers: {
-      "Authorization": `Bearer ${accessToken}`,
-      "Content-Type": "application/json"
+    const response = await fetch(`https://api.mercadopago.com/v1/orders?${params.toString()}`, {
+      headers: {
+        "Authorization": `Bearer ${accessToken}`,
+        "Content-Type": "application/json"
+      }
+    });
+
+    const result = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      const error = new Error(
+        result?.message || result?.error || `Mercado Pago respondeu HTTP ${response.status}`
+      );
+      error.status = response.status;
+      error.details = result;
+      throw error;
     }
+
+    return Array.isArray(result?.data) ? result.data : [];
+  }
+
+  // 1) Busca oficial por external_reference, sem restringir status.
+  // Alguns retries mostraram que filtrar também por status podia não retornar a Order.
+  let orders = await queryOrders({
+    external_reference: externalReference,
+    page: "1",
+    page_size: "100",
+    sort_by: "created_date",
+    sort_order: "desc"
   });
 
-  const result = await response.json().catch(() => ({}));
+  let order = orders.find(item => String(item?.external_reference || "") === externalReference);
+  if (order) return order;
 
-  if (!response.ok) {
-    const error = new Error(
-      result?.message || result?.error || `Mercado Pago respondeu HTTP ${response.status}`
-    );
-    error.status = response.status;
-    error.details = result;
-    throw error;
-  }
+  // 2) Fallback diagnóstico/compatibilidade: busca as Orders online no mesmo intervalo
+  // e faz o match da referência no servidor. Isso evita depender do filtro externo
+  // quando o endpoint responde 200 porém retorna data vazio.
+  orders = await queryOrders({
+    page: "1",
+    page_size: "100",
+    sort_by: "created_date",
+    sort_order: "desc"
+  });
 
-  const orders = Array.isArray(result?.data) ? result.data : [];
-  const order = orders.find(item => String(item?.external_reference || "") === externalReference);
+  order = orders.find(item => String(item?.external_reference || "") === externalReference);
+  if (order) return order;
 
-  if (!order) {
-    const error = new Error("Não foi possível localizar a order pelo identificador do pagamento.");
-    error.status = 404;
-    throw error;
-  }
+  console.warn("Order não localizada no retry por referência:", {
+    externalReference,
+    beginDate,
+    endDate,
+    scannedOrders: orders.length
+  });
 
-  return order;
+  const error = new Error("Não foi possível localizar a order pelo identificador do pagamento.");
+  error.status = 404;
+  throw error;
 }
 
 async function fetchMercadoPagoOrder(orderId) {

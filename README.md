@@ -1,23 +1,13 @@
-# Casamento T&L — v22.0.2 — retry de mensagem por busca da Order
+# Casamento T&L — v22.0.3 — retry robusto de Order
 
-Esta versão parte da v22.0.1 e mantém a integração de produção do Mercado Pago intacta.
+Esta versão mantém a integração estável do Mercado Pago e o envio por Resend.
 
-## Correção
+Correções no retry de mensagem por cartão:
+- primeiro consulta a Order pelo ID original;
+- em 404, busca pela `external_reference` assinada;
+- a busca usa uma janela maior e não depende do filtro de status;
+- se o filtro por `external_reference` retornar vazio, faz uma busca ampla do período e compara a referência no servidor;
+- quando a API devolve uma Order recuperada pela referência, valida obrigatoriamente `processed`, `accredited`, mesma referência e mesmo valor antes do envio;
+- `package.json` e `/api/health` identificam corretamente a versão 22.0.3.
 
-No reenvio tardio da mensagem por e-mail, se `GET /v1/orders/{id}` responder 404, o servidor usa o endpoint oficial de busca de Orders e localiza a compra pela `external_reference` assinada no token da mensagem.
-
-Depois disso, continua exigindo:
-- `status: processed`;
-- `status_detail: accredited`;
-- mesma `external_reference`;
-- mesmo valor do presente.
-
-Só após essas validações o e-mail é enviado pelo Resend.
-
-As variáveis do Render permanecem as mesmas:
-- `MP_ACCESS_TOKEN`
-- `MP_WEBHOOK_SECRET`
-- `RESEND_API_KEY`
-- `GIFT_EMAIL_TO`
-
-Não é necessário fazer outro pagamento para testar o retry existente.
+Não altera as variáveis de ambiente existentes.
