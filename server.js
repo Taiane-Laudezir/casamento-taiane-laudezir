@@ -295,7 +295,7 @@ app.get("/api/health", (req, res) => {
 
   res.json({
     ok: true,
-    version: "22.0.3-gift-message-order-retry",
+    version: "22.0.4-final-cleanup",
     mercadoPagoConfigured: Boolean(token && token !== "SEU_ACCESS_TOKEN_AQUI"),
     webhookConfigured: Boolean(webhookSecret),
     giftEmailConfigured: Boolean(String(process.env.RESEND_API_KEY || "").trim() && String(process.env.GIFT_EMAIL_TO || "").trim())

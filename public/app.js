@@ -123,7 +123,35 @@ modal.addEventListener("click", e => {
   if (e.target === modal) closePayment();
 });
 
+const CARD_MESSAGE_MAX_AGE_MS = 1000 * 60 * 60 * 24;
+
+function clearPaymentResultParam() {
+  const cleanParams = new URLSearchParams(window.location.search);
+  if (!cleanParams.has("payment_result")) return;
+  cleanParams.delete("payment_result");
+  const query = cleanParams.toString();
+  history.replaceState(null, "", `${location.pathname}${query ? `?${query}` : ""}${location.hash || ""}`);
+}
+
+function dismissPaymentReturnToast() {
+  document.querySelectorAll(".payment-return").forEach(el => el.remove());
+}
+
+function clearExpiredPendingCardMessage() {
+  try {
+    const pending = JSON.parse(localStorage.getItem("tl_pending_card_message") || "null");
+    if (pending?.createdAt && Date.now() - Number(pending.createdAt) > CARD_MESSAGE_MAX_AGE_MS) {
+      localStorage.removeItem("tl_pending_card_message");
+    }
+  } catch (_) {}
+}
+
 function openPayment(gift) {
+  // Um novo presente não deve herdar avisos de um retorno antigo do cartão.
+  dismissPaymentReturnToast();
+  clearPaymentResultParam();
+  clearExpiredPendingCardMessage();
+
   selectedGift = gift;
   guestData = null;
   currentPixMessageToken = null;
@@ -329,6 +357,11 @@ async function sendPixMessage() {
 
     button.textContent = "Mensagem enviada 💚";
     if (status) status.textContent = "Taiane e Laudezir receberão sua mensagem por e-mail.";
+
+    // Evita que um retorno antigo de cartão fique visível junto com o sucesso do Pix.
+    dismissPaymentReturnToast();
+    clearPaymentResultParam();
+    clearExpiredPendingCardMessage();
   } catch (error) {
     console.error(error);
     button.disabled = false;
@@ -396,7 +429,7 @@ async function confirmPendingCardMessage(statusElement) {
     if (statusElement) statusElement.textContent = "Pagamento concluído.";
     return true;
   }
-  if (Date.now() - Number(pending.createdAt || 0) > 1000 * 60 * 60 * 24 * 7) {
+  if (Date.now() - Number(pending.createdAt || 0) > CARD_MESSAGE_MAX_AGE_MS) {
     localStorage.removeItem("tl_pending_card_message");
     if (statusElement) statusElement.textContent = "Pagamento concluído.";
     return true;
@@ -441,6 +474,12 @@ function showPaymentReturnMessage() {
   const result = params.get("payment_result");
   if (!result) return;
 
+  // O parâmetro de retorno só vale para esta abertura da página.
+  // Removê-lo imediatamente evita que F5 ou um novo Pix revivam um aviso antigo.
+  clearPaymentResultParam();
+  clearExpiredPendingCardMessage();
+  dismissPaymentReturnToast();
+
   const messages = {
     success: {
       title: "Obrigado pelo presente!",
@@ -467,24 +506,33 @@ function showPaymentReturnMessage() {
 
   const statusText = toast.querySelector("span");
 
-  const clearPaymentResult = () => {
-    const cleanParams = new URLSearchParams(window.location.search);
-    cleanParams.delete("payment_result");
-    const query = cleanParams.toString();
-    history.replaceState(null, "", `${location.pathname}${query ? `?${query}` : ""}`);
-  };
-
   if (result === "success") {
-    // Só limpa o marcador quando a mensagem foi enviada (ou não há dados pendentes).
-    // Se o envio falhar, mantemos ?payment_result=success para que F5 tente novamente.
     confirmPendingCardMessage(statusText).then(sent => {
-      if (sent) clearPaymentResult();
+      if (sent) return;
+
+      // Em uma falha real e recente, o convidado ainda pode tentar de novo,
+      // mas o retry fica dentro do aviso e não depende de manter a URL suja.
+      const retry = document.createElement("button");
+      retry.type = "button";
+      retry.className = "payment-return-retry";
+      retry.textContent = "Tentar enviar a mensagem novamente";
+      toast.appendChild(retry);
+
+      retry.addEventListener("click", async () => {
+        retry.disabled = true;
+        retry.textContent = "Tentando novamente...";
+        const resent = await confirmPendingCardMessage(statusText);
+        if (resent) {
+          retry.remove();
+        } else {
+          retry.disabled = false;
+          retry.textContent = "Tentar enviar a mensagem novamente";
+        }
+      });
     });
-  } else {
-    clearPaymentResult();
   }
 
-  toast.querySelector("button").addEventListener("click", () => toast.remove());
+  toast.querySelector(".payment-return-close").addEventListener("click", () => toast.remove());
 
   setTimeout(() => {
     document.getElementById("presentes")?.scrollIntoView({behavior:"smooth", block:"start"});

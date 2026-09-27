@@ -1542,6 +1542,22 @@ header[id]{
 }
 .payment-return-failure{border-left-color:#9b4848}
 .payment-return-pending{border-left-color:#b99a63}
+.payment-return-retry{
+  justify-self:start;
+  margin-top:8px;
+  border:1px solid rgba(75,92,55,.28);
+  border-radius:999px;
+  background:#f4f5ef;
+  color:var(--olive);
+  padding:8px 12px;
+  font:inherit;
+  font-size:12px;
+  cursor:pointer;
+}
+.payment-return-retry:disabled{
+  opacity:.65;
+  cursor:wait;
+}
 .payment-return-close{
   position:absolute;
   right:12px;
